@@ -1,9 +1,14 @@
-﻿Public Class Form3
+﻿Imports System.Data.OleDb
+Public Class Form3
     Public FI, obj As Object
-    Public rst As DAO.Recordset
+    Public rst, qrst As DAO.Recordset
     Public coll As Collection
     Public bool As Boolean
     Public dbl As Double
+    Public dt As New DataTable
+    Public objDA As New OleDbDataAdapter()
+
+
 
     Public Qry, str1, ErrMsg, XMLStr, VchSeries, VchDate, VchNo As String
     Public num, VchType As Integer
@@ -38,6 +43,14 @@
 
     Private Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click
         DeleteJournalVoucher()
+    End Sub
+
+    Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
+        GetDataFromBusy("GRS", "Select * from Tran1 where VchCode = 1")
+    End Sub
+
+    Private Sub DataGridView1_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellContentClick
+
     End Sub
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
@@ -246,5 +259,34 @@
 
         'Close Busy Company which is opened thru OpenCSDB function
         FI.CloseDB
+    End Function
+
+    Public Function GetDataFromBusy(Method, Query)
+        FI = connectDB()
+        If Method = "GRS" Then
+            qrst = FI.GetRecordset(Query)
+        ElseIf Method = "GRSBUSYDB" Then
+            qrst = FI.GetRecordsetFromCompanyDB(Query)
+        ElseIf Method = "ExecuteQuery" Then
+            qrst = FI.ExecuteQuery(Query)
+        Else
+            RichTextBox1.AppendText("Query Method not defined" & Environment.NewLine)
+            Return 0
+        End If
+        RichTextBox1.AppendText("Writing Data to Form" & Environment.NewLine)
+        Debug.Print(qrst(0).Name)
+
+        'Debug.Print(qrst.GetRows)
+        Console.WriteLine(qrst(0))
+
+        RichTextBox1.AppendText(qrst.Fields)
+
+        'objDA.Fill(dt, qrst)
+        'Return objDA
+
+        'dt = qrst
+        'DataGridView1.DataSource = dt
+        'DataGridView1.Refresh()
+
     End Function
 End Class
