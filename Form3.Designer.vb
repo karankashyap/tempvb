@@ -34,6 +34,7 @@ Partial Class Form3
         Me.Button6 = New System.Windows.Forms.Button()
         Me.Button7 = New System.Windows.Forms.Button()
         Me.DataGridView1 = New System.Windows.Forms.DataGridView()
+        Me.Button8 = New System.Windows.Forms.Button()
         Me.DAOBindingSource = New System.Windows.Forms.BindingSource(Me.components)
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DAOBindingSource, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -136,6 +137,15 @@ Partial Class Form3
         Me.DataGridView1.Size = New System.Drawing.Size(240, 150)
         Me.DataGridView1.TabIndex = 10
         '
+        'Button8
+        '
+        Me.Button8.Location = New System.Drawing.Point(130, 107)
+        Me.Button8.Name = "Button8"
+        Me.Button8.Size = New System.Drawing.Size(75, 23)
+        Me.Button8.TabIndex = 11
+        Me.Button8.Text = "ServiceCall"
+        Me.Button8.UseVisualStyleBackColor = True
+        '
         'DAOBindingSource
         '
         Me.DAOBindingSource.DataSource = GetType(DAO._DAO)
@@ -145,6 +155,7 @@ Partial Class Form3
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(753, 261)
+        Me.Controls.Add(Me.Button8)
         Me.Controls.Add(Me.DataGridView1)
         Me.Controls.Add(Me.Button7)
         Me.Controls.Add(Me.Button6)
@@ -176,4 +187,5 @@ Partial Class Form3
     Friend WithEvents Button6 As Button
     Friend WithEvents Button7 As Button
     Friend WithEvents DataGridView1 As DataGridView
+    Friend WithEvents Button8 As Button
 End Class

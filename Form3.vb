@@ -25,7 +25,7 @@ Public Class Form3
 
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        saveVch()
+        saleVch()
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
@@ -51,6 +51,14 @@ Public Class Form3
 
     Private Sub DataGridView1_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellContentClick
 
+    End Sub
+
+    Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click
+        Dim serviceCallTest As New testService.Testing_Service
+        Dim val As String = serviceCallTest.Say_Hello(Text)
+        Dim vsl1 As String = "Select * from Tran1 where VchCode = " & val
+        'GetDataFromBusy("GRS", "Select * from Tran1 where VchCode = " & val)
+        MsgBox(serviceCallTest.Say_Hello(Text))
     End Sub
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
@@ -93,7 +101,7 @@ Public Class Form3
     End Sub
 
 
-    Public Function saveVch()
+    Public Function saleVch()
         FI = connectDB()
         VchType = 9    'For SALE vch. Vchtype=9
 
