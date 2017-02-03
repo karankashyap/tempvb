@@ -16,8 +16,13 @@ Public Class Form3
 
 
     Function connectDB()
-        FI = CreateObject("Busy2L16.CFixedInterface")
-        FI.OpenDB("D:\Program Files (x86)\BusyWin", "D:\Program Files (x86)\BusyWin\DATA\", "Comp0002")
+        Try
+            FI = CreateObject(Constant.DEFAULT_L14_DLL & "." & Constant.DEFAULT_CLASS)
+        Catch
+            FI = CreateObject(Constant.DEFAULT_DLL & "." & Constant.DEFAULT_CLASS)
+        End Try
+
+        FI.OpenDB(Constant.PRG_PATH, Constant.DATA_PATH, Constant.COMPANY_CODE)
         Label1.Text = "Connected to Database as: " & FI.GetCurrentUserName & " | SuperUser: " & FI.IfSuperUser(FI.GetCurrentUserName)
         Return FI
     End Function
@@ -46,10 +51,10 @@ Public Class Form3
     End Sub
 
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
-        GetDataFromBusy("GRS", "Select * from Tran1 where VchCode = 1")
+        GetDataFromBusy("GRS", "Select * from Master1")
     End Sub
 
-    Private Sub DataGridView1_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellContentClick
+    Private Sub DataGridView1_CellContentClick(sender As Object, e As DataGridViewCellEventArgs)
 
     End Sub
 
@@ -61,9 +66,16 @@ Public Class Form3
         MsgBox(serviceCallTest.Say_Hello(Text))
     End Sub
 
+    Private Sub DataGridView1_CellContentClick_1(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellContentClick
+
+    End Sub
+
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
         PurchaseVch()
     End Sub
+
+
+
 
     Private Sub Form3_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         FI = connectDB()
@@ -269,7 +281,15 @@ Public Class Form3
         FI.CloseDB
     End Function
 
+
+
     Public Function GetDataFromBusy(Method, Query)
+        'DataControl.generateXML()
+        'str1 = DataControl.storedQueries("StockStatus")
+        'str1 = Constant.CURRENT_MODE
+
+
+
         FI = connectDB()
         If Method = "GRS" Then
             qrst = FI.GetRecordset(Query)
@@ -281,20 +301,14 @@ Public Class Form3
             RichTextBox1.AppendText("Query Method not defined" & Environment.NewLine)
             Return 0
         End If
-        RichTextBox1.AppendText("Writing Data to Form" & Environment.NewLine)
-        Debug.Print(qrst(0).Name)
+        Console.Write(qrst)
+        DataGridView1.DataSource = Nothing
 
-        'Debug.Print(qrst.GetRows)
-        Console.WriteLine(qrst(0))
-
-        RichTextBox1.AppendText(qrst.Fields)
-
-        'objDA.Fill(dt, qrst)
-        'Return objDA
-
-        'dt = qrst
-        'DataGridView1.DataSource = dt
+        DataGridView1.DataSource = qrst
         'DataGridView1.Refresh()
+
+        RichTextBox1.AppendText("Writing Data to Form" & Environment.NewLine)
+
 
     End Function
 End Class
