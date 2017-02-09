@@ -1,7 +1,7 @@
 ﻿
 Public Class DataControl
     Inherits Form3
-    'Public funcName, VchNo, VchType, VchName, VchDate, ItemSrNo, ItemName, UnitName, Qty, Price, Amt, STAmt, STPerc As String
+
 
     Public Shared Function storedQueries(qName)
         If qName = "StockStatus" Then
@@ -26,6 +26,7 @@ Public Class DataControl
 
 
     Public Shared Function generateXML()
+        'funcName, VchNo, VchType, VchName, VchDate, ItemSrNo, ItemName, UnitName, Qty, Price, Amt, STAmt, STPerc, TaxBfrSurChg,MC
 
         Dim funcName = "1"
         Dim VchNo = "1"
@@ -41,6 +42,9 @@ Public Class DataControl
         Dim STPerc = "1"
         'Dim VchType = VchType    'For SALE vch. Vchtype=9
         Dim VchType = 9
+        Dim TaxBfrSurChg, MC, BSSrNo1, BSName1, BSPercentVal, BSAmt, BSSrNo2, BSName2, BSAmt2 As String
+        'BSSrNo1, BSName1, BSPercentVal = "1"
+        'BSAmt, BSSrNo2, BSName2, BSAmt2 = "1"
 
         'Sale,01-04-2016,
         Dim XmlStr As String
@@ -49,16 +53,36 @@ Public Class DataControl
         XmlStr = XmlStr & "<VchOtherInfoDetails><Narration1>Sample Narration</Narration1></VchOtherInfoDetails>"
 
         XmlStr = XmlStr & "<ItemEntries>"
-        XmlStr = XmlStr & "<ItemDetail><SrNo>" & ItemSrNo & "</SrNo><ItemName>" & ItemName & "</ItemName><UnitName>" & UnitName & "</UnitName><Qty>" & Qty & "</Qty><Price>" & Price & "</Price><Amt>" & Amt & "</Amt><STAmount>" & STAmt & "</STAmount><STPercent>" & STPerc & "</STPercent><TaxBeforeSurcharge>10.5</TaxBeforeSurcharge><MC>Main Store</MC></ItemDetail>"
+        XmlStr = XmlStr & "<ItemDetail><SrNo>" & ItemSrNo & "</SrNo><ItemName>" & ItemName & "</ItemName><UnitName>" & UnitName & "</UnitName><Qty>" & Qty & "</Qty><Price>" & Price & "</Price><Amt>" & Amt & "</Amt><STAmount>" & STAmt & "</STAmount><STPercent>" & STPerc & "</STPercent><TaxBeforeSurcharge>" & TaxBfrSurChg & "</TaxBeforeSurcharge><MC>" & MC & "</MC></ItemDetail>"
         XmlStr = XmlStr & "</ItemEntries>"
 
         XmlStr = XmlStr & "<BillSundries>"
-        XmlStr = XmlStr & "<BSDetail><SrNo>1</SrNo><BSName>Discount</BSName><PercentVal>10</PercentVal><Amt>238.55</Amt></BSDetail>"
-        XmlStr = XmlStr & "<BSDetail><SrNo>2</SrNo><BSName>Freight &amp; Forwarding Charges</BSName><Amt>100</Amt></BSDetail>"
+        XmlStr = XmlStr & "<BSDetail><SrNo>" & BSSrNo1 & "</SrNo><BSName>" & BSName1 & "</BSName><PercentVal>" & BSPercentVal & "</PercentVal><Amt>" & BSAmt & "</Amt></BSDetail>"
+        XmlStr = XmlStr & "<BSDetail><SrNo>" & BSSrNo2 & "</SrNo><BSName>" & BSName2 & "</BSName><Amt>" & BSAmt2 & "</Amt></BSDetail>"
         XmlStr = XmlStr & "</BillSundries>"
         XmlStr = XmlStr & "</Sale>"
 
-        MsgBox(XmlStr)
+        Return XmlStr
 
+    End Function
+
+
+    Public Shared Function generatePurchaseXML()
+        Dim XMLStr = "<Purchase>"
+        XMLStr = XMLStr & "<VchSeriesName>Main</VchSeriesName><Date>01-04-2016</Date><VchType>2</VchType><VchNo>1</VchNo><STPTName>VAT/Exempt</STPTName><MasterName1>Busy Infotech Pvt. Ltd.</MasterName1><MasterName2>Main Store</MasterName2>"
+        XMLStr = XMLStr & "<VchOtherInfoDetails><PurchaseBillNo>Supp Purc Ref No.</PurchaseBillNo><Narration1>Sample Narration</Narration1></VchOtherInfoDetails>"
+
+        XMLStr = XMLStr & "<ItemEntries>"
+        XMLStr = XMLStr & "<ItemDetail><SrNo>1</SrNo><ItemName>Item 1</ItemName><UnitName>Kgs.</UnitName><Qty>100</Qty><Price>90</Price><Amt>9000</Amt><STAmount>90</STAmount><STPercent>1</STPercent><TaxBeforeSurcharge>90</TaxBeforeSurcharge><MC>Main Store</MC></ItemDetail>"
+        XMLStr = XMLStr & "<ItemDetail><SrNo>2</SrNo><ItemName>Item 2</ItemName><UnitName>Kgs.</UnitName><Qty>100</Qty><Price>90</Price><Amt>9000</Amt><STAmount>90</STAmount><STPercent>1</STPercent><TaxBeforeSurcharge>90</TaxBeforeSurcharge><MC>Main Store</MC></ItemDetail>"
+        XMLStr = XMLStr & "<ItemDetail><SrNo>3</SrNo><ItemName>Item 3</ItemName><UnitName>Pcs.</UnitName><Qty>5</Qty><Price>101</Price><Amt>530.25</Amt><STAmount>25.25</STAmount><STPercent>5</STPercent><TaxBeforeSurcharge>25.25</TaxBeforeSurcharge><MC>Main Store</MC></ItemDetail>"
+        XMLStr = XMLStr & "</ItemEntries>"
+
+        XMLStr = XMLStr & "<BillSundries>"
+        XMLStr = XMLStr & "<BSDetail><SrNo>1</SrNo><BSName>Discount</BSName><PercentVal>10</PercentVal><Amt>1800</Amt></BSDetail>"
+        XMLStr = XMLStr & "<BSDetail><SrNo>2</SrNo><BSName>Freight &amp; Forwarding Charges</BSName><Amt>100</Amt></BSDetail>"
+        XMLStr = XMLStr & "</BillSundries>"
+
+        XMLStr = XMLStr & "</Purchase>"
     End Function
 End Class

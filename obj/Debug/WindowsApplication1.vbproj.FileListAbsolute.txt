@@ -8,8 +8,6 @@ D:\Program Files (x86)\BusyWin\DATA\COMP0002\WindowsApplication1\obj\Debug\Windo
 D:\Program Files (x86)\BusyWin\DATA\COMP0002\WindowsApplication1\obj\Debug\WindowsApplication1.exe
 D:\Program Files (x86)\BusyWin\DATA\COMP0002\WindowsApplication1\obj\Debug\WindowsApplication1.xml
 D:\Program Files (x86)\BusyWin\DATA\COMP0002\WindowsApplication1\obj\Debug\WindowsApplication1.pdb
-D:\Program Files (x86)\BusyWin\DATA\COMP0002\WindowsApplication1\bin\Debug\Database1.mdb
 D:\Program Files (x86)\BusyWin\DATA\COMP0002\WindowsApplication1\obj\Debug\WindowsApplication1.Form3.resources
 D:\Program Files (x86)\BusyWin\DATA\COMP0002\WindowsApplication1\obj\Debug\WindowsApplication1.vbproj.ResolveComReference.cache
 D:\Program Files (x86)\BusyWin\DATA\COMP0002\WindowsApplication1\obj\Debug\Interop.DAO.dll
-D:\Program Files (x86)\BusyWin\DATA\COMP0002\WindowsApplication1\obj\Debug\WindowsApplication1.DataControl.resources

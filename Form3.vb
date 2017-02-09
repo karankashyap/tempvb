@@ -1,4 +1,6 @@
 ﻿Imports System.Data.OleDb
+Imports System.IO
+Imports System.Runtime.Serialization.Formatters.Binary
 Public Class Form3
     Public FI, obj As Object
     Public rst, qrst As DAO.Recordset
@@ -7,6 +9,7 @@ Public Class Form3
     Public dbl As Double
     Public dt As New DataTable
     Public objDA As New OleDbDataAdapter()
+    Public ado As ADODB.Recordset
 
 
 
@@ -51,7 +54,8 @@ Public Class Form3
     End Sub
 
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
-        GetDataFromBusy("GRS", "Select * from Master1")
+        GetDataFromBusy("GRS", "Select VchCode from Tran1")
+        '        GetDataFromBusy("GRSBUSYDB", "")
     End Sub
 
     Private Sub DataGridView1_CellContentClick(sender As Object, e As DataGridViewCellEventArgs)
@@ -167,25 +171,7 @@ Public Class Form3
     Function PurchaseVch()
         FI = connectDB()
         VchType = 2    'For PURCHASE vch. Vchtype=2
-        XMLStr = "<Purchase>"
-        XMLStr = XMLStr & "<VchSeriesName>Main</VchSeriesName><Date>01-04-2016</Date><VchType>2</VchType><VchNo>1</VchNo><STPTName>VAT/Exempt</STPTName><MasterName1>Busy Infotech Pvt. Ltd.</MasterName1><MasterName2>Main Store</MasterName2>"
-        XMLStr = XMLStr & "<VchOtherInfoDetails><PurchaseBillNo>Supp Purc Ref No.</PurchaseBillNo><Narration1>Sample Narration</Narration1></VchOtherInfoDetails>"
-
-        XMLStr = XMLStr & "<ItemEntries>"
-        XMLStr = XMLStr & "<ItemDetail><SrNo>1</SrNo><ItemName>Item 1</ItemName><UnitName>Kgs.</UnitName><Qty>100</Qty><Price>90</Price><Amt>9000</Amt><STAmount>90</STAmount><STPercent>1</STPercent><TaxBeforeSurcharge>90</TaxBeforeSurcharge><MC>Main Store</MC></ItemDetail>"
-        XMLStr = XMLStr & "<ItemDetail><SrNo>2</SrNo><ItemName>Item 2</ItemName><UnitName>Kgs.</UnitName><Qty>100</Qty><Price>90</Price><Amt>9000</Amt><STAmount>90</STAmount><STPercent>1</STPercent><TaxBeforeSurcharge>90</TaxBeforeSurcharge><MC>Main Store</MC></ItemDetail>"
-        XMLStr = XMLStr & "<ItemDetail><SrNo>3</SrNo><ItemName>Item 3</ItemName><UnitName>Pcs.</UnitName><Qty>5</Qty><Price>101</Price><Amt>530.25</Amt><STAmount>25.25</STAmount><STPercent>5</STPercent><TaxBeforeSurcharge>25.25</TaxBeforeSurcharge><MC>Main Store</MC></ItemDetail>"
-        XMLStr = XMLStr & "</ItemEntries>"
-
-        XMLStr = XMLStr & "<BillSundries>"
-        XMLStr = XMLStr & "<BSDetail><SrNo>1</SrNo><BSName>Discount</BSName><PercentVal>10</PercentVal><Amt>1800</Amt></BSDetail>"
-        XMLStr = XMLStr & "<BSDetail><SrNo>2</SrNo><BSName>Freight &amp; Forwarding Charges</BSName><Amt>100</Amt></BSDetail>"
-        XMLStr = XMLStr & "</BillSundries>"
-
-        XMLStr = XMLStr & "</Purchase>"
-
-
-
+        DataControl.generatePurchaseXML()
         'Save XML string in Busy
         'Function Defination in Busy - SaveVchFromXML(ByVal p_VchType As Variant, ByVal p_XMLStr As Variant, ByRef p_ErrStr As Variant, Optional ByVal p_Modify = True) As Boolean
         If FI.SaveVchFromXML(VchType, XMLStr, ErrMsg) Then
@@ -284,28 +270,24 @@ Public Class Form3
 
 
     Public Function GetDataFromBusy(Method, Query)
-        'DataControl.generateXML()
-        'str1 = DataControl.storedQueries("StockStatus")
-        'str1 = Constant.CURRENT_MODE
-
-
+        'Dim gxml As String = DataControl.generateXML()
+        'MsgBox(gxml)
 
         FI = connectDB()
         If Method = "GRS" Then
-            qrst = FI.GetRecordset(Query)
+            qrst = FI.GetRecordset(DataControl.storedQueries("StockStatus"))
         ElseIf Method = "GRSBUSYDB" Then
-            qrst = FI.GetRecordsetFromCompanyDB(Query)
+            MsgBox("Executing... ")
+            qrst = FI.GetRecordsetFromCompanyDB(DataControl.storedQueries("StockStatus"))
         ElseIf Method = "ExecuteQuery" Then
-            qrst = FI.ExecuteQuery(Query)
+            qrst = FI.ExecuteQuery(DataControl.storedQueries("StockStatus"))
         Else
             RichTextBox1.AppendText("Query Method not defined" & Environment.NewLine)
             Return 0
         End If
-        Console.Write(qrst)
-        DataGridView1.DataSource = Nothing
-
-        DataGridView1.DataSource = qrst
-        'DataGridView1.Refresh()
+        MsgBox(qrst)
+        Console.WriteLine(qrst)
+        'Console.WriteLine(qrst.GetRows())
 
         RichTextBox1.AppendText("Writing Data to Form" & Environment.NewLine)
 
