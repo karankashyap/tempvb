@@ -26,7 +26,7 @@ Public Class Form3
         End Try
 
         FI.OpenDB(Constant.PRG_PATH, Constant.DATA_PATH, Constant.COMPANY_CODE)
-        Label1.Text = "Connected to Database as: " & FI.GetCurrentUserName & " | SuperUser: " & FI.IfSuperUser(FI.GetCurrentUserName)
+        Label1.Text = "Connected to Database as: " & FI.GetCurrentUserName & " | SuperUser: " & FI.IfSuperUser(FI.GetCurrentUserName) & Constant.COMPANY_CODE
         Return FI
     End Function
 
@@ -54,8 +54,13 @@ Public Class Form3
     End Sub
 
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
-        GetDataFromBusy("GRS", "Select VchCode from Tran1")
-        '        GetDataFromBusy("GRSBUSYDB", "")
+        'GetDataFromBusy("GRS", "Select * from Tran4")
+        GetDataFromBusy("GRS", DataControl.storedQueries("StockStatus"))
+
+        'GetDataFromBusy("GRS", "Select * from Tran2 where RecType=2")
+
+
+
     End Sub
 
     Private Sub DataGridView1_CellContentClick(sender As Object, e As DataGridViewCellEventArgs)
@@ -70,9 +75,7 @@ Public Class Form3
         MsgBox(serviceCallTest.Say_Hello(Text))
     End Sub
 
-    Private Sub DataGridView1_CellContentClick_1(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellContentClick
 
-    End Sub
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
         PurchaseVch()
@@ -275,7 +278,8 @@ Public Class Form3
 
         FI = connectDB()
         If Method = "GRS" Then
-            qrst = FI.GetRecordset(DataControl.storedQueries("StockStatus"))
+            'qrst = FI.GetRecordset(DataControl.storedQueries("StockStatus"))
+            qrst = FI.GetRecordset(Query)
         ElseIf Method = "GRSBUSYDB" Then
             MsgBox("Executing... ")
             qrst = FI.GetRecordsetFromCompanyDB(DataControl.storedQueries("StockStatus"))
@@ -285,8 +289,71 @@ Public Class Form3
             RichTextBox1.AppendText("Query Method not defined" & Environment.NewLine)
             Return 0
         End If
-        MsgBox(qrst)
-        Console.WriteLine(qrst)
+
+
+        RichTextBox1.AppendText(qrst.RecordCount & ", Fields: " & qrst.Fields.Count & Environment.NewLine)
+        RichTextBox1.AppendText(Query & Environment.NewLine)
+        Dim i As Integer = 0
+        Do Until i = qrst.Fields.Count
+            Try
+                RichTextBox1.AppendText(qrst.Fields(i).Name & " ---> " & qrst.Fields(i).Value & Environment.NewLine)
+            Catch
+                RichTextBox1.AppendText(qrst.Fields(i).Name & " ---> " & Environment.NewLine)
+            End Try
+
+            i += 1
+        Loop
+        Return 1
+        'RichTextBox2.AppendText("Item/Product: " & qrst()!PrintName.Value & Environment.NewLine)
+        'RichTextBox2.AppendText("MRP: " & qrst()!D2.Value & Environment.NewLine)
+        'RichTextBox2.AppendText("Description: " & qrst()!Address1.Value & Environment.NewLine)
+        'RichTextBox2.AppendText("           " & qrst()!Address2.Value & Environment.NewLine)
+        'RichTextBox2.AppendText("           " & qrst()!Address3.Value & Environment.NewLine)
+        'RichTextBox2.AppendText("           " & qrst()!Address4.Value & Environment.NewLine)
+        'RichTextBox2.AppendText("Code:  " & qrst()!Code.Value & Environment.NewLine)
+
+        Dim ItemSrNo As Integer = 1
+        Dim ItemName As String = qrst()!Name.Value
+        Dim Qty As Integer = 1
+        Dim Price As Double = qrst()!D2.Value
+        Dim Amt As Double = Qty * Price
+        VchType = 9
+        VchDate = Format(CDate("04-10-2016"), "dd-mm-yyyy")
+
+
+        XMLStr = XMLStr & "<Sale>"
+        XMLStr = XMLStr & "<VchSeriesName>Main</VchSeriesName><Date>14-02-2016</Date><VchType>9</VchType>"
+        XMLStr = XMLStr & "<ItemEntries>"
+        XMLStr = XMLStr & "<ItemDetail><SrNo>" & ItemSrNo & "</SrNo><ItemName>" & ItemName & "</ItemName><Qty>" & Qty & "</Qty><Price>" & Price & "</Price><Amt>" & Amt & "</Amt></ItemDetail>"
+        XMLStr = XMLStr & "</ItemEntries>"
+        XMLStr = XMLStr & "</Sale>"
+
+        If FI.SaveVchFromXML(VchType, XMLStr, ErrMsg) Then
+            RichTextBox2.AppendText("Voucher Saved" & Environment.NewLine)
+        Else
+            RichTextBox2.AppendText(ErrMsg & Environment.NewLine)
+            RichTextBox2.AppendText(XMLStr & Environment.NewLine)
+        End If
+
+
+
+
+        If qrst.RecordCount > 0 Then
+            qrst.MoveFirst()
+            qrst.MoveLast()
+
+            Do While Not qrst.EOF
+
+                'RichTextBox1.AppendText(qrst()!Code.Value & Environment.NewLine)
+                'RichTextBox1.AppendText(qrst()!Name.Value & Environment.NewLine)
+                'RichTextBox1.AppendText(qrst()!PrintName.Value & Environment.NewLine)
+                'RichTextBox1.AppendText(qrst()!Stamp.Value & Environment.NewLine)
+
+                'GET Stock status, price etc.    
+                qrst.MoveNext()
+            Loop
+        End If
+
         'Console.WriteLine(qrst.GetRows())
 
         RichTextBox1.AppendText("Writing Data to Form" & Environment.NewLine)

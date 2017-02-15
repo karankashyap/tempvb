@@ -4,8 +4,9 @@ Public Class DataControl
 
 
     Public Shared Function storedQueries(qName)
+        Dim RetQrr As String
         If qName = "StockStatus" Then
-            Return "SELECT M.Name AS Name,(Select Top 1 NameAlias from Help1 as H1 where 
+            RetQrr = "SELECT M.Name AS Name,(Select Top 1 NameAlias from Help1 as H1 where 
                     H1.NameOrAlias = 1 and H1.Code = M.PG) AS ParentGrpName, M.Mc AS McName, 
                     S1.MTB AS MainTransBal, S1.ATB AS AltTransBal,(Select Top 1 NameAlias from Help1 as 
                     H1 where H1.NameOrAlias = 1 and H1.Code = M.U1) as MU, (Select Top 1 NameAlias 
@@ -20,7 +21,16 @@ Public Class DataControl
                     M LEFT JOIN (SELECT mastercode1, Mastercode2, sum(value1) AS MTB,sum(value2) AS 
                     ATB From tran2  Where rectype = 2  group by Mastercode1,Mastercode2) AS S1 ON 
                     (S1.Mastercode1 = M.c) AND (S1.Mastercode2 = M.CM)   ORDER BY M.Name "
+        ElseIf qName = "GetProductInfo" Then
+            RetQrr = "Select M.Name,M.Alias,M.PrintName,M.Code,M.D2,M.D3,M.D4,M.D9,M.D10,M.D16,M.D17,
+                      A.Address1,A.Address2,A.Address3,A.Address4 from Master1 AS M, MasterAddressInfo AS A
+                     where M.MasterType=6 AND M.Alias='000002' AND A.MasterCode=M.Code"
+        ElseIf qName = "GetProductDetail" Then
+            RetQrr = ""
+        ElseIf qName = "TestQrr" Then
+            RetQrr = "Select Address1,Address2,Address3,Address4 from MasterAddressInfo where MasterCode=1221"
         End If
+        Return RetQrr
 
     End Function
 
@@ -48,18 +58,18 @@ Public Class DataControl
 
         'Sale,01-04-2016,
         Dim XmlStr As String
-        XmlStr = XmlStr & "<" & VchName & ">"
-        XmlStr = XmlStr & "<VchSeriesName>Main</VchSeriesName><Date>" & VchDate & "</Date><VchType>" & VchType & "</VchType><VchNo>" & VchNo & "</VchNo><STPTName>VAT/MultiTax(R)</STPTName><MasterName1>Busy Infotech Pvt. Ltd.</MasterName1><MasterName2>Main Store</MasterName2>"
-        XmlStr = XmlStr & "<VchOtherInfoDetails><Narration1>Sample Narration</Narration1></VchOtherInfoDetails>"
+        XmlStr = XmlStr & "<Sale>"
+        'XmlStr = XmlStr & "<VchSeriesName>Main</VchSeriesName><Date>" & VchDate & "</Date><VchType>" & VchType & "</VchType><VchNo>" & VchNo & "</VchNo><STPTName>VAT/MultiTax(R)</STPTName><MasterName1>Busy Infotech Pvt. Ltd.</MasterName1><MasterName2>Main Store</MasterName2>"
+        'XmlStr = XmlStr & "<VchOtherInfoDetails><Narration1>Sample Narration</Narration1></VchOtherInfoDetails>"
 
         XmlStr = XmlStr & "<ItemEntries>"
         XmlStr = XmlStr & "<ItemDetail><SrNo>" & ItemSrNo & "</SrNo><ItemName>" & ItemName & "</ItemName><UnitName>" & UnitName & "</UnitName><Qty>" & Qty & "</Qty><Price>" & Price & "</Price><Amt>" & Amt & "</Amt><STAmount>" & STAmt & "</STAmount><STPercent>" & STPerc & "</STPercent><TaxBeforeSurcharge>" & TaxBfrSurChg & "</TaxBeforeSurcharge><MC>" & MC & "</MC></ItemDetail>"
         XmlStr = XmlStr & "</ItemEntries>"
 
-        XmlStr = XmlStr & "<BillSundries>"
-        XmlStr = XmlStr & "<BSDetail><SrNo>" & BSSrNo1 & "</SrNo><BSName>" & BSName1 & "</BSName><PercentVal>" & BSPercentVal & "</PercentVal><Amt>" & BSAmt & "</Amt></BSDetail>"
-        XmlStr = XmlStr & "<BSDetail><SrNo>" & BSSrNo2 & "</SrNo><BSName>" & BSName2 & "</BSName><Amt>" & BSAmt2 & "</Amt></BSDetail>"
-        XmlStr = XmlStr & "</BillSundries>"
+        'XmlStr = XmlStr & "<BillSundries>"
+        'XmlStr = XmlStr & "<BSDetail><SrNo>" & BSSrNo1 & "</SrNo><BSName>" & BSName1 & "</BSName><PercentVal>" & BSPercentVal & "</PercentVal><Amt>" & BSAmt & "</Amt></BSDetail>"
+        'XmlStr = XmlStr & "<BSDetail><SrNo>" & BSSrNo2 & "</SrNo><BSName>" & BSName2 & "</BSName><Amt>" & BSAmt2 & "</Amt></BSDetail>"
+        'XmlStr = XmlStr & "</BillSundries>"
         XmlStr = XmlStr & "</Sale>"
 
         Return XmlStr

@@ -96,6 +96,7 @@
     <Compile Include="control.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="q.vb" />
     <Compile Include="constants.vb">
       <SubType>Form</SubType>
     </Compile>
