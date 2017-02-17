@@ -3,7 +3,7 @@ Public Class DataControl
     Inherits Form3
 
 
-    Public Shared Function storedQueries(qName)
+    Public Shared Function storedQueries(qName, ItemAlias)
         Dim RetQrr As String
         If qName = "StockStatus" Then
             RetQrr = "SELECT M.Name AS Name,(Select Top 1 NameAlias from Help1 as H1 where 
@@ -21,78 +21,52 @@ Public Class DataControl
                     M LEFT JOIN (SELECT mastercode1, Mastercode2, sum(value1) AS MTB,sum(value2) AS 
                     ATB From tran2  Where rectype = 2  group by Mastercode1,Mastercode2) AS S1 ON 
                     (S1.Mastercode1 = M.c) AND (S1.Mastercode2 = M.CM)   ORDER BY M.Name "
+        ElseIf qName = "StockStatusNew" Then
+            RetQrr = "Select M.Name As Name,M.Alias As Alias,M.Printname As PrintName ,M.D9 As SVP,M.I4 As SVM,M.C As Code,M.PG As ParentGrp,M.D2,
+                        (Select Top 1 NameAlias from Help1 as H1 where H1.NameOrAlias = 1 And H1.Code = M.PG) AS ParentGrpName,
+                        M.CM as MCCode, M.Mc As McName, S1.MTB As MainTransBal, S1.ATB As AltTransBal,
+                        (Select Top 1 NameAlias from Help1 as H1 where H1.NameOrAlias = 1 And H1.Code = M.U1) as MU,
+                        (Select Top 1 NameAlias from Help1 as H1 where H1.NameOrAlias = 1 And H1.Code = M.U2) as AU,
+                        (select Sum(d1) from tran4 where tran4.mastercode1=  M.C And  tran4.mastercode2= M.Cm) AS MainOpBal,
+                        (select Sum(d2) from tran4 where tran4.mastercode1=  M.C And  tran4.mastercode2= M.Cm) AS AltOPBal,
+                        (select Sum(d3) from tran4 where tran4.mastercode1=  M.C And  tran4.mastercode2= M.Cm) AS AmtOpBal
+                        FROM(Select A.Name as Name, A.Alias As Alias, A.PrintName As PrintName, A.code As C, A.ParentGrp As PG, A.I4 As I4,
+                        A.D9 as D9, A.CM1 As U1, A.CM2 As U2, B.Name As Mc, B.Code As CM , A.D2  from Master1 As A, Master1 as B
+                        where A.Mastertype = 6 And B.Mastertype = 11 And 
+                        A.Alias ='" & ItemAlias & "') AS M LEFT JOIN
+                        (SELECT mastercode1, Mastercode2, sum(value1) As MTB, sum(value2) AS ATB From tran2  Where rectype = 2 And Date <= '07-05-2016' group by Mastercode1,Mastercode2) AS S1
+                        On (S1.Mastercode1 = M.c) And (S1.Mastercode2 = M.CM)  ORDER BY M.Name"
+
         ElseIf qName = "GetProductInfo" Then
-            RetQrr = "Select M.Name,M.Alias,M.PrintName,M.Code,M.D2,M.D3,M.D4,M.D9,M.D10,M.D16,M.D17,
-                      A.Address1,A.Address2,A.Address3,A.Address4 from Master1 AS M, MasterAddressInfo AS A
-                     where M.MasterType=6 AND M.Alias='000002' AND A.MasterCode=M.Code"
-        ElseIf qName = "GetProductDetail" Then
-            RetQrr = ""
+            RetQrr = "Select M.Name,M.Alias,M.PrintName,M.Code,M.D2,M.D3,M.D4,M.D9,M.D10,M.D16,M.D17,A.Address1,A.Address2,A.Address3,A.Address4 from Master1 AS M, MasterAddressInfo AS A where M.MasterType=6 AND M.Alias='" & ItemAlias & "' AND A.MasterCode=M.Code"
+        ElseIf qName = "STPTName" Then
+            RetQrr = "Select M1.Name,MS.* from Master1 as M1 inner join MasterSupport as MS on 
+                        M1.Code=MS.MasterCode where MS.MasterCode=(Select CM8 From Master1 where 
+                        MasterType=6 and 
+                        Alias='" & ItemAlias & "')"
         ElseIf qName = "TestQrr" Then
-            RetQrr = "Select Address1,Address2,Address3,Address4 from MasterAddressInfo where MasterCode=1221"
+            RetQrr = "Select * from Master1 where MasterType=2"
         End If
         Return RetQrr
 
     End Function
 
 
-    Public Shared Function generateXML()
-        'funcName, VchNo, VchType, VchName, VchDate, ItemSrNo, ItemName, UnitName, Qty, Price, Amt, STAmt, STPerc, TaxBfrSurChg,MC
-
-        Dim funcName = "1"
-        Dim VchNo = "1"
-        Dim VchName = " 1"
-        Dim VchDate = "1"
-        Dim ItemSrNo = "1"
-        Dim ItemName = "1"
-        Dim UnitName = "1"
-        Dim Qty = "1"
-        Dim Price = "1"
-        Dim Amt = "1"
-        Dim STAmt = "1"
-        Dim STPerc = "1"
-        'Dim VchType = VchType    'For SALE vch. Vchtype=9
-        Dim VchType = 9
-        Dim TaxBfrSurChg, MC, BSSrNo1, BSName1, BSPercentVal, BSAmt, BSSrNo2, BSName2, BSAmt2 As String
-        'BSSrNo1, BSName1, BSPercentVal = "1"
-        'BSAmt, BSSrNo2, BSName2, BSAmt2 = "1"
-
-        'Sale,01-04-2016,
-        Dim XmlStr As String
-        XmlStr = XmlStr & "<Sale>"
-        'XmlStr = XmlStr & "<VchSeriesName>Main</VchSeriesName><Date>" & VchDate & "</Date><VchType>" & VchType & "</VchType><VchNo>" & VchNo & "</VchNo><STPTName>VAT/MultiTax(R)</STPTName><MasterName1>Busy Infotech Pvt. Ltd.</MasterName1><MasterName2>Main Store</MasterName2>"
-        'XmlStr = XmlStr & "<VchOtherInfoDetails><Narration1>Sample Narration</Narration1></VchOtherInfoDetails>"
-
-        XmlStr = XmlStr & "<ItemEntries>"
-        XmlStr = XmlStr & "<ItemDetail><SrNo>" & ItemSrNo & "</SrNo><ItemName>" & ItemName & "</ItemName><UnitName>" & UnitName & "</UnitName><Qty>" & Qty & "</Qty><Price>" & Price & "</Price><Amt>" & Amt & "</Amt><STAmount>" & STAmt & "</STAmount><STPercent>" & STPerc & "</STPercent><TaxBeforeSurcharge>" & TaxBfrSurChg & "</TaxBeforeSurcharge><MC>" & MC & "</MC></ItemDetail>"
-        XmlStr = XmlStr & "</ItemEntries>"
-
-        'XmlStr = XmlStr & "<BillSundries>"
-        'XmlStr = XmlStr & "<BSDetail><SrNo>" & BSSrNo1 & "</SrNo><BSName>" & BSName1 & "</BSName><PercentVal>" & BSPercentVal & "</PercentVal><Amt>" & BSAmt & "</Amt></BSDetail>"
-        'XmlStr = XmlStr & "<BSDetail><SrNo>" & BSSrNo2 & "</SrNo><BSName>" & BSName2 & "</BSName><Amt>" & BSAmt2 & "</Amt></BSDetail>"
-        'XmlStr = XmlStr & "</BillSundries>"
-        XmlStr = XmlStr & "</Sale>"
-
-        Return XmlStr
-
-    End Function
-
-
-    Public Shared Function generatePurchaseXML()
-        Dim XMLStr = "<Purchase>"
-        XMLStr = XMLStr & "<VchSeriesName>Main</VchSeriesName><Date>01-04-2016</Date><VchType>2</VchType><VchNo>1</VchNo><STPTName>VAT/Exempt</STPTName><MasterName1>Busy Infotech Pvt. Ltd.</MasterName1><MasterName2>Main Store</MasterName2>"
-        XMLStr = XMLStr & "<VchOtherInfoDetails><PurchaseBillNo>Supp Purc Ref No.</PurchaseBillNo><Narration1>Sample Narration</Narration1></VchOtherInfoDetails>"
-
+    Public Shared Function generateXML(VchDate, STPTName, ItemName, Qty, Price, Amt)
+        Dim XMLStr As String
+        XMLStr = "<Sale>"
+        XMLStr = XMLStr & "<VchSeriesName>Main</VchSeriesName><Date>" & VchDate & "</Date><VchType>9</VchType>"
+        XMLStr = XMLStr & "<STPTName>" & STPTName & "</STPTName><MasterName1>Cash</MasterName1>"
         XMLStr = XMLStr & "<ItemEntries>"
-        XMLStr = XMLStr & "<ItemDetail><SrNo>1</SrNo><ItemName>Item 1</ItemName><UnitName>Kgs.</UnitName><Qty>100</Qty><Price>90</Price><Amt>9000</Amt><STAmount>90</STAmount><STPercent>1</STPercent><TaxBeforeSurcharge>90</TaxBeforeSurcharge><MC>Main Store</MC></ItemDetail>"
-        XMLStr = XMLStr & "<ItemDetail><SrNo>2</SrNo><ItemName>Item 2</ItemName><UnitName>Kgs.</UnitName><Qty>100</Qty><Price>90</Price><Amt>9000</Amt><STAmount>90</STAmount><STPercent>1</STPercent><TaxBeforeSurcharge>90</TaxBeforeSurcharge><MC>Main Store</MC></ItemDetail>"
-        XMLStr = XMLStr & "<ItemDetail><SrNo>3</SrNo><ItemName>Item 3</ItemName><UnitName>Pcs.</UnitName><Qty>5</Qty><Price>101</Price><Amt>530.25</Amt><STAmount>25.25</STAmount><STPercent>5</STPercent><TaxBeforeSurcharge>25.25</TaxBeforeSurcharge><MC>Main Store</MC></ItemDetail>"
+        XMLStr = XMLStr & "<ItemDetail><ItemName>" & ItemName & "</ItemName><Qty>" & Qty & "</Qty><Price>" & Price & "</Price><Amt>" & Amt & "</Amt></ItemDetail>"
         XMLStr = XMLStr & "</ItemEntries>"
+        XMLStr = XMLStr & "</Sale>"
 
-        XMLStr = XMLStr & "<BillSundries>"
-        XMLStr = XMLStr & "<BSDetail><SrNo>1</SrNo><BSName>Discount</BSName><PercentVal>10</PercentVal><Amt>1800</Amt></BSDetail>"
-        XMLStr = XMLStr & "<BSDetail><SrNo>2</SrNo><BSName>Freight &amp; Forwarding Charges</BSName><Amt>100</Amt></BSDetail>"
-        XMLStr = XMLStr & "</BillSundries>"
 
-        XMLStr = XMLStr & "</Purchase>"
+        Return XMLStr
+
     End Function
+
+
+
 End Class

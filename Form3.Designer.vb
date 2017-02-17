@@ -22,37 +22,15 @@ Partial Class Form3
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.Button1 = New System.Windows.Forms.Button()
-        Me.Button2 = New System.Windows.Forms.Button()
         Me.Label1 = New System.Windows.Forms.Label()
-        Me.Button3 = New System.Windows.Forms.Button()
         Me.RichTextBox1 = New System.Windows.Forms.RichTextBox()
         Me.Label2 = New System.Windows.Forms.Label()
-        Me.Button4 = New System.Windows.Forms.Button()
-        Me.Button5 = New System.Windows.Forms.Button()
-        Me.Button6 = New System.Windows.Forms.Button()
-        Me.Button7 = New System.Windows.Forms.Button()
-        Me.Button8 = New System.Windows.Forms.Button()
+        Me.executeQuery = New System.Windows.Forms.Button()
+        Me.serviceCall = New System.Windows.Forms.Button()
         Me.RichTextBox2 = New System.Windows.Forms.RichTextBox()
+        Me.ItemAliasText = New System.Windows.Forms.TextBox()
+        Me.Label3 = New System.Windows.Forms.Label()
         Me.SuspendLayout()
-        '
-        'Button1
-        '
-        Me.Button1.Location = New System.Drawing.Point(26, 48)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(75, 23)
-        Me.Button1.TabIndex = 0
-        Me.Button1.Text = "Sale"
-        Me.Button1.UseVisualStyleBackColor = True
-        '
-        'Button2
-        '
-        Me.Button2.Location = New System.Drawing.Point(235, 48)
-        Me.Button2.Name = "Button2"
-        Me.Button2.Size = New System.Drawing.Size(75, 23)
-        Me.Button2.TabIndex = 1
-        Me.Button2.Text = "Delete"
-        Me.Button2.UseVisualStyleBackColor = True
         '
         'Label1
         '
@@ -62,15 +40,6 @@ Partial Class Form3
         Me.Label1.Size = New System.Drawing.Size(120, 13)
         Me.Label1.TabIndex = 2
         Me.Label1.Text = "Connected to Database"
-        '
-        'Button3
-        '
-        Me.Button3.Location = New System.Drawing.Point(125, 48)
-        Me.Button3.Name = "Button3"
-        Me.Button3.Size = New System.Drawing.Size(75, 23)
-        Me.Button3.TabIndex = 3
-        Me.Button3.Text = "Purchase"
-        Me.Button3.UseVisualStyleBackColor = True
         '
         'RichTextBox1
         '
@@ -89,50 +58,23 @@ Partial Class Form3
         Me.Label2.TabIndex = 5
         Me.Label2.Text = "Result Box"
         '
-        'Button4
+        'executeQuery
         '
-        Me.Button4.Location = New System.Drawing.Point(125, 78)
-        Me.Button4.Name = "Button4"
-        Me.Button4.Size = New System.Drawing.Size(104, 23)
-        Me.Button4.TabIndex = 6
-        Me.Button4.Text = "Purchase Order"
-        Me.Button4.UseVisualStyleBackColor = True
+        Me.executeQuery.Location = New System.Drawing.Point(26, 83)
+        Me.executeQuery.Name = "executeQuery"
+        Me.executeQuery.Size = New System.Drawing.Size(97, 23)
+        Me.executeQuery.TabIndex = 9
+        Me.executeQuery.Text = "Execute Query"
+        Me.executeQuery.UseVisualStyleBackColor = True
         '
-        'Button5
+        'serviceCall
         '
-        Me.Button5.Location = New System.Drawing.Point(26, 78)
-        Me.Button5.Name = "Button5"
-        Me.Button5.Size = New System.Drawing.Size(93, 23)
-        Me.Button5.TabIndex = 7
-        Me.Button5.Text = "Save Journal"
-        Me.Button5.UseVisualStyleBackColor = True
-        '
-        'Button6
-        '
-        Me.Button6.Location = New System.Drawing.Point(235, 78)
-        Me.Button6.Name = "Button6"
-        Me.Button6.Size = New System.Drawing.Size(86, 23)
-        Me.Button6.TabIndex = 8
-        Me.Button6.Text = "Delete Journal"
-        Me.Button6.UseVisualStyleBackColor = True
-        '
-        'Button7
-        '
-        Me.Button7.Location = New System.Drawing.Point(26, 108)
-        Me.Button7.Name = "Button7"
-        Me.Button7.Size = New System.Drawing.Size(97, 23)
-        Me.Button7.TabIndex = 9
-        Me.Button7.Text = "Execute Query"
-        Me.Button7.UseVisualStyleBackColor = True
-        '
-        'Button8
-        '
-        Me.Button8.Location = New System.Drawing.Point(130, 107)
-        Me.Button8.Name = "Button8"
-        Me.Button8.Size = New System.Drawing.Size(75, 23)
-        Me.Button8.TabIndex = 11
-        Me.Button8.Text = "ServiceCall"
-        Me.Button8.UseVisualStyleBackColor = True
+        Me.serviceCall.Location = New System.Drawing.Point(129, 83)
+        Me.serviceCall.Name = "serviceCall"
+        Me.serviceCall.Size = New System.Drawing.Size(75, 23)
+        Me.serviceCall.TabIndex = 11
+        Me.serviceCall.Text = "ServiceCall"
+        Me.serviceCall.UseVisualStyleBackColor = True
         '
         'RichTextBox2
         '
@@ -142,39 +84,47 @@ Partial Class Form3
         Me.RichTextBox2.TabIndex = 12
         Me.RichTextBox2.Text = ""
         '
+        'ItemAliasText
+        '
+        Me.ItemAliasText.Location = New System.Drawing.Point(130, 48)
+        Me.ItemAliasText.Name = "ItemAliasText"
+        Me.ItemAliasText.Size = New System.Drawing.Size(100, 20)
+        Me.ItemAliasText.TabIndex = 13
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Location = New System.Drawing.Point(26, 52)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(102, 13)
+        Me.Label3.TabIndex = 14
+        Me.Label3.Text = "Enter Barcode/Alias"
+        '
         'Form3
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(753, 261)
+        Me.Controls.Add(Me.Label3)
+        Me.Controls.Add(Me.ItemAliasText)
         Me.Controls.Add(Me.RichTextBox2)
-        Me.Controls.Add(Me.Button8)
-        Me.Controls.Add(Me.Button7)
-        Me.Controls.Add(Me.Button6)
-        Me.Controls.Add(Me.Button5)
-        Me.Controls.Add(Me.Button4)
+        Me.Controls.Add(Me.serviceCall)
+        Me.Controls.Add(Me.executeQuery)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.RichTextBox1)
-        Me.Controls.Add(Me.Button3)
         Me.Controls.Add(Me.Label1)
-        Me.Controls.Add(Me.Button2)
-        Me.Controls.Add(Me.Button1)
         Me.Name = "Form3"
         Me.Text = "Form3"
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
     End Sub
-    Friend WithEvents Button1 As Button
-    Friend WithEvents Button2 As Button
     Friend WithEvents Label1 As Label
-    Friend WithEvents Button3 As Button
     Friend WithEvents RichTextBox1 As RichTextBox
     Friend WithEvents Label2 As Label
-    Friend WithEvents Button4 As Button
-    Friend WithEvents Button5 As Button
-    Friend WithEvents Button6 As Button
-    Friend WithEvents Button7 As Button
-    Friend WithEvents Button8 As Button
+    Friend WithEvents executeQuery As Button
+    Friend WithEvents serviceCall As Button
     Friend WithEvents RichTextBox2 As RichTextBox
+    Friend WithEvents ItemAliasText As TextBox
+    Friend WithEvents Label3 As Label
 End Class

@@ -9,6 +9,9 @@
     Public Const COMPANY_CODE As String = "Comp0003" ' Company Code as shown in BUSY
     Public Const COMPANY_CODE_ALTER As String = "Comp0002" ' Company Code as shown in BUSY, NOT USED
 
+    Public Const ERR_SALE As String = "Sale could not be recorded."
+
+
 
 
 End Class
