@@ -2,7 +2,6 @@
 Public Class DataControl
     Inherits Form3
 
-
     Public Shared Function storedQueries(qName, ItemAlias)
         Dim RetQrr As String
         If qName = "StockStatus" Then
@@ -34,8 +33,12 @@ Public Class DataControl
                         A.D9 as D9, A.CM1 As U1, A.CM2 As U2, B.Name As Mc, B.Code As CM , A.D2  from Master1 As A, Master1 as B
                         where A.Mastertype = 6 And B.Mastertype = 11 And 
                         A.Alias ='" & ItemAlias & "') AS M LEFT JOIN
-                        (SELECT mastercode1, Mastercode2, sum(value1) As MTB, sum(value2) AS ATB From tran2  Where rectype = 2 And Date <= '07-05-2016' group by Mastercode1,Mastercode2) AS S1
+                        (SELECT mastercode1, Mastercode2, sum(value1) As MTB, sum(value2) AS ATB From 
+                        tran2  Where rectype = 2
+
+                        group by Mastercode1, Mastercode2) AS S1
                         On (S1.Mastercode1 = M.c) And (S1.Mastercode2 = M.CM)  ORDER BY M.Name"
+            'And Date = '" & Constant.FY_DATE & "' 
 
         ElseIf qName = "GetProductInfo" Then
             RetQrr = "Select M.Name,M.Alias,M.PrintName,M.Code,M.D2,M.D3,M.D4,M.D9,M.D10,M.D16,M.D17,A.Address1,A.Address2,A.Address3,A.Address4 from Master1 AS M, MasterAddressInfo AS A where M.MasterType=6 AND M.Alias='" & ItemAlias & "' AND A.MasterCode=M.Code"
@@ -46,6 +49,9 @@ Public Class DataControl
                         Alias='" & ItemAlias & "')"
         ElseIf qName = "TestQrr" Then
             RetQrr = "Select * from Master1 where MasterType=2"
+        End If
+        If Constant.CURRENT_MODE = "DEV" Then
+            MsgBox(RetQrr, Title:=qName)
         End If
         Return RetQrr
 

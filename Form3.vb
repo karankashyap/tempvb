@@ -22,9 +22,12 @@ Public Class Form3
         Catch
             FI = CreateObject(Constant.DEFAULT_DLL & "." & Constant.DEFAULT_CLASS)
         End Try
+        Try
+            FI.OpenDB(Constant.PRG_PATH, Constant.DATA_PATH, Constant.COMPANY_CODE)
+            Label1.Text = "Connected to Database as: " & FI.GetCurrentUserName & " | SuperUser: " & FI.IfSuperUser(FI.GetCurrentUserName) & Constant.COMPANY_CODE
+        Catch
+        End Try
 
-        FI.OpenDB(Constant.PRG_PATH, Constant.DATA_PATH, Constant.COMPANY_CODE)
-        Label1.Text = "Connected to Database as: " & FI.GetCurrentUserName & " | SuperUser: " & FI.IfSuperUser(FI.GetCurrentUserName) & Constant.COMPANY_CODE
         Return FI
     End Function
 
@@ -40,7 +43,7 @@ Public Class Form3
 
 
     Private Sub Button8_Click(sender As Object, e As EventArgs) Handles serviceCall.Click
-        MsgBox("ok")
+
         Dim serviceCallTest As New testService.Testing_Service
 
         'GetDataFromBusy("GRS", "Select * from Tran1 where VchCode = " & val)
@@ -50,7 +53,17 @@ Public Class Form3
 
 
     Private Sub Form3_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        'CREATE INVOICE DIR AT START
+        Dim path = Constant.DATA_PATH & Constant.COMPANY_CODE & Constant.INVOICE_DIR
+        Try
+            If (Not System.IO.Directory.Exists(path)) Then
+                System.IO.Directory.CreateDirectory(path)
+            End If
+        Catch
+            MsgBox(Constant.ERR_PDFDIR, Title:=Constant.ERR_PDFDIR)
+        End Try
 
+        'DebugApp("")
 
     End Sub
 
@@ -76,18 +89,22 @@ Public Class Form3
     End Function
     Public Function GetCurrentStockOfItem(ItemAlias)
         FI = connectDB()
-        qrst1 = FI.GetRecordset(DataControl.storedQueries("StockStatusNew", ItemAlias))
+        'qrst1 = FI.GetRecordset(DataControl.storedQueries("StockStatusNew", ItemAlias))
+        qrst1 = FI.GetRecordsetFromCompanyDB(DataControl.storedQueries("StockStatus", ItemAlias))
+        If Constant.CURRENT_MODE = "DEV" Then
+            Console.WriteLine(qrst1)
+            'RichTextBox2.AppendText(DataControl.storedQueries("StockStatusNew", ItemAlias) & Environment.NewLine)
+            Dim i As Integer = 0
+            Do Until i = qrst1.Fields.Count
+                Try
+                    RichTextBox1.AppendText(qrst1.Fields(i).Name & " ---> " & qrst1.Fields(i).Value & Environment.NewLine)
+                Catch
+                    RichTextBox1.AppendText(qrst1.Fields(i).Name & " ---> " & Environment.NewLine)
+                End Try
+                i += 1
+            Loop
 
-        'Dim i As Integer = 0
-        'Do Until i = qrst.Fields.Count
-        'Try
-        'RichTextBox1.AppendText(qrst.Fields(i).Name & " ---> " & qrst.Fields(i).Value & Environment.NewLine)
-        'Catch
-        'RichTextBox1.AppendText(qrst.Fields(i).Name & " ---> " & Environment.NewLine)
-        'End Try
-        '
-        'i += 1
-        'Loop
+        End If
 
         Try
             If Not IsDBNull(qrst1()!MainOpBal.Value) And Not IsDBNull(qrst1()!MainTransBal.Value) Then
@@ -129,22 +146,6 @@ Public Class Form3
         End If
 
         CurrentStock = GetCurrentStockOfItem(ItemAlias)
-        Try
-
-            RichTextBox2.AppendText("Current Stock:  " & CurrentStock & Environment.NewLine)
-
-            RichTextBox2.AppendText("Item/Product: " & qrst()!PrintName.Value & Environment.NewLine)
-            RichTextBox2.AppendText("MRP: " & qrst()!D2.Value & Environment.NewLine)
-            RichTextBox2.AppendText("Description: " & qrst()!Address1.Value & Environment.NewLine)
-            RichTextBox2.AppendText("           " & qrst()!Address2.Value & Environment.NewLine)
-            RichTextBox2.AppendText("           " & qrst()!Address3.Value & Environment.NewLine)
-            RichTextBox2.AppendText("           " & qrst()!Address4.Value & Environment.NewLine)
-            RichTextBox2.AppendText("Code:  " & qrst()!Code.Value & Environment.NewLine)
-            RichTextBox2.AppendText("Code:  " & CurrentStock & Environment.NewLine)
-
-        Catch
-
-        End Try
 
         Dim STName As String = GetSTPTName(ItemAlias)
         Dim STPTName As String = ConvertSTPT(STName)
@@ -159,11 +160,28 @@ Public Class Form3
 
 
         Dim ItemSrNo As Integer = 1
-        Dim Qty As Integer = 15
+        'TO-DO Quantity 
+        Dim Qty As Integer = 24
         Dim Amt As Double = Qty * Price
-        VchType = 9
-        VchDate = "01-04-2017"
+        VchType = Constant.VCH_TYPE
+        VchDate = Constant.FY_DATE
 
+        If Constant.CURRENT_MODE = "DEBUG" Then
+            Try
+                RichTextBox2.AppendText("Current Stock:  " & CurrentStock & Environment.NewLine)
+                RichTextBox2.AppendText("Item/Product: " & qrst()!PrintName.Value & Environment.NewLine)
+                RichTextBox2.AppendText("MRP: " & qrst()!D2.Value & Environment.NewLine)
+                RichTextBox2.AppendText("Description: " & qrst()!Address1.Value & Environment.NewLine)
+                RichTextBox2.AppendText("           " & qrst()!Address2.Value & Environment.NewLine)
+                RichTextBox2.AppendText("           " & qrst()!Address3.Value & Environment.NewLine)
+                RichTextBox2.AppendText("           " & qrst()!Address4.Value & Environment.NewLine)
+                RichTextBox2.AppendText("Code:  " & qrst()!Code.Value & Environment.NewLine)
+                RichTextBox2.AppendText("Closing Stock:  " & CurrentStock & Environment.NewLine)
+                RichTextBox2.AppendText("Amount: " & Amt & Environment.NewLine)
+                RichTextBox2.AppendText("STPT: " & STPTName & Environment.NewLine)
+            Catch
+            End Try
+        End If
 
         XMLStr = DataControl.generateXML(VchDate, STPTName, ItemName, Qty, Price, Amt)
         Try
@@ -172,6 +190,7 @@ Public Class Form3
             MsgBox(Constant.ERR_SALE)
         End Try
 
+        generatePDF(49)
 
     End Function
 
@@ -195,14 +214,43 @@ Public Class Form3
     End Function
     Public Function makeASale(VchType, XMLStr)
         FI = connectDB()
-        If FI.SaveVchFromXML(VchType, XMLStr, ErrMsg) Then
-            RichTextBox2.AppendText("Sale Successful" & Environment.NewLine)
-            Return True
-        Else
-            RichTextBox2.AppendText(ErrMsg & Environment.NewLine)
-            RichTextBox2.AppendText(XMLStr & Environment.NewLine)
-            Return False
+        Try
+            If FI.SaveVchFromXML(VchType, XMLStr, ErrMsg) Then
+                RichTextBox2.AppendText("Sale Successful" & Environment.NewLine)
+                Return True
+            End If
+        Catch
+            MsgBox(Constant.ERR_SALE)
+            If Constant.CURRENT_MODE = "DEBUG" Then
+                RichTextBox2.AppendText(ErrMsg & Environment.NewLine)
+                RichTextBox2.AppendText(XMLStr & Environment.NewLine)
+            End If
+        End Try
+        Return False
+
+    End Function
+
+    Public Function generatePDF(VchCode)
+        FI = connectDB()
+        If Constant.CURRENT_MODE = "DEBUG" Then
+            MsgBox(VchCode)
         End If
+        Dim pdfGen = False
+        Dim InvoicePath = Constant.DATA_PATH & Constant.COMPANY_CODE & Constant.INVOICE_DIR & VchCode
+
+        Try
+            pdfGen = FI.GeneratePDFForInvoice(VchCode, InvoicePath)
+        Catch
+            MsgBox(Constant.ERR_PDF)
+        End Try
+        Try
+            System.Diagnostics.Process.Start(InvoicePath & ".pdf")
+        Catch
+            MsgBox(Constant.ERR_OPNPDF)
+        End Try
+
+        Return pdfGen
+
     End Function
 
 
