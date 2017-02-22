@@ -35,7 +35,7 @@ Public Class DataControl
                         A.Alias ='" & ItemAlias & "') AS M LEFT JOIN
                         (SELECT mastercode1, Mastercode2, sum(value1) As MTB, sum(value2) AS ATB From 
                         tran2  Where rectype = 2
-
+                        And Date <=#" & Constant.CL_DATE & "# 
                         group by Mastercode1, Mastercode2) AS S1
                         On (S1.Mastercode1 = M.c) And (S1.Mastercode2 = M.CM)  ORDER BY M.Name"
             'And Date = '" & Constant.FY_DATE & "' 
@@ -58,14 +58,31 @@ Public Class DataControl
     End Function
 
 
-    Public Shared Function generateXML(VchDate, STPTName, ItemName, Qty, Price, Amt)
+    Public Function XMLItemDetail(ItemName, Qty, Price, Amt, STPTName)
+
+        XMLStr2 = XMLStr2 & "<STPTName>" & STPTName & "</STPTName><MasterName1>Cash</MasterName1>"
+        XMLStr1 = XMLStr1 & "<ItemDetail><ItemName>" & ItemName & "</ItemName><Qty>" & Qty & "</Qty><Price>" & Price & "</Price><Amt>" & Amt & "</Amt></ItemDetail>"
+
+        Using addXML1 = System.IO.File.CreateText(opsPath & sessId & "_xml1.txt")
+            addXML1.WriteLine(XMLStr1)
+        End Using
+        Using addXML2 = System.IO.File.CreateText(opsPath & sessId & "_xml2.txt")
+            addXML2.WriteLine(XMLStr2)
+        End Using
+        Return True
+    End Function
+
+    Public Shared Function generateXML(VchDate, XMLStr1, XMLStr2)
         Dim XMLStr As String
         XMLStr = "<Sale>"
         XMLStr = XMLStr & "<VchSeriesName>Main</VchSeriesName><Date>" & VchDate & "</Date><VchType>9</VchType>"
-        XMLStr = XMLStr & "<STPTName>" & STPTName & "</STPTName><MasterName1>Cash</MasterName1>"
+        XMLStr = XMLStr & XMLStr2
         XMLStr = XMLStr & "<ItemEntries>"
-        XMLStr = XMLStr & "<ItemDetail><ItemName>" & ItemName & "</ItemName><Qty>" & Qty & "</Qty><Price>" & Price & "</Price><Amt>" & Amt & "</Amt></ItemDetail>"
+        XMLStr = XMLStr & XMLStr1
         XMLStr = XMLStr & "</ItemEntries>"
+        'XMLStr = XMLStr & "<BillSundries>"
+        'XMLStr = XMLStr & "<BSDetail><SrNo>1</SrNo><BSName>Discount</BSName><PercentVal>14.5</PercentVal><Amt>238.55</Amt></BSDetail>"
+        'XMLStr = XMLStr & "</BillSundries>"
         XMLStr = XMLStr & "</Sale>"
 
 

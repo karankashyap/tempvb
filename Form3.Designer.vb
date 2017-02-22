@@ -30,6 +30,10 @@ Partial Class Form3
         Me.RichTextBox2 = New System.Windows.Forms.RichTextBox()
         Me.ItemAliasText = New System.Windows.Forms.TextBox()
         Me.Label3 = New System.Windows.Forms.Label()
+        Me.ItemQty = New System.Windows.Forms.TextBox()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.Button1 = New System.Windows.Forms.Button()
+        Me.TextBox1 = New System.Windows.Forms.TextBox()
         Me.SuspendLayout()
         '
         'Label1
@@ -60,25 +64,25 @@ Partial Class Form3
         '
         'executeQuery
         '
-        Me.executeQuery.Location = New System.Drawing.Point(26, 83)
+        Me.executeQuery.Location = New System.Drawing.Point(130, 113)
         Me.executeQuery.Name = "executeQuery"
         Me.executeQuery.Size = New System.Drawing.Size(97, 23)
         Me.executeQuery.TabIndex = 9
-        Me.executeQuery.Text = "Execute Query"
+        Me.executeQuery.Text = "Add to Cart"
         Me.executeQuery.UseVisualStyleBackColor = True
         '
         'serviceCall
         '
-        Me.serviceCall.Location = New System.Drawing.Point(129, 83)
+        Me.serviceCall.Location = New System.Drawing.Point(315, 113)
         Me.serviceCall.Name = "serviceCall"
-        Me.serviceCall.Size = New System.Drawing.Size(75, 23)
+        Me.serviceCall.Size = New System.Drawing.Size(97, 23)
         Me.serviceCall.TabIndex = 11
         Me.serviceCall.Text = "ServiceCall"
         Me.serviceCall.UseVisualStyleBackColor = True
         '
         'RichTextBox2
         '
-        Me.RichTextBox2.Location = New System.Drawing.Point(418, 48)
+        Me.RichTextBox2.Location = New System.Drawing.Point(418, 113)
         Me.RichTextBox2.Name = "RichTextBox2"
         Me.RichTextBox2.Size = New System.Drawing.Size(323, 136)
         Me.RichTextBox2.TabIndex = 12
@@ -100,11 +104,47 @@ Partial Class Form3
         Me.Label3.TabIndex = 14
         Me.Label3.Text = "Enter Barcode/Alias"
         '
+        'ItemQty
+        '
+        Me.ItemQty.Location = New System.Drawing.Point(130, 77)
+        Me.ItemQty.Name = "ItemQty"
+        Me.ItemQty.Size = New System.Drawing.Size(100, 20)
+        Me.ItemQty.TabIndex = 15
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(29, 83)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(74, 13)
+        Me.Label4.TabIndex = 16
+        Me.Label4.Text = "Enter Quantity"
+        '
+        'Button1
+        '
+        Me.Button1.Location = New System.Drawing.Point(234, 113)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(75, 23)
+        Me.Button1.TabIndex = 17
+        Me.Button1.Text = "Checkout"
+        Me.Button1.UseVisualStyleBackColor = True
+        '
+        'TextBox1
+        '
+        Me.TextBox1.Location = New System.Drawing.Point(315, 48)
+        Me.TextBox1.Name = "TextBox1"
+        Me.TextBox1.Size = New System.Drawing.Size(100, 20)
+        Me.TextBox1.TabIndex = 18
+        '
         'Form3
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(753, 261)
+        Me.Controls.Add(Me.TextBox1)
+        Me.Controls.Add(Me.Button1)
+        Me.Controls.Add(Me.Label4)
+        Me.Controls.Add(Me.ItemQty)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.ItemAliasText)
         Me.Controls.Add(Me.RichTextBox2)
@@ -127,4 +167,8 @@ Partial Class Form3
     Friend WithEvents RichTextBox2 As RichTextBox
     Friend WithEvents ItemAliasText As TextBox
     Friend WithEvents Label3 As Label
+    Friend WithEvents ItemQty As TextBox
+    Friend WithEvents Label4 As Label
+    Friend WithEvents Button1 As Button
+    Friend WithEvents TextBox1 As TextBox
 End Class

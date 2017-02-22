@@ -10,9 +10,27 @@ Public Class Form3
     Public dt As New DataTable
     Public objDA As New OleDbDataAdapter()
     Public ado As ADODB.Recordset
+    Public random As New Random()
+    Public id = random.Next(100000, 9999999)
+    Public sessId = id
 
-    Public Qry, str1, ErrMsg, XMLStr, VchSeries, VchDate, VchNo As String
+    Public Arr1(25, 2) As String
+    Public fs As FileStream
+
+
+    Public Qry, str1, ErrMsg, XMLStr, XMLStr1, XMLStr2, VchSeries, VchDate, VchNo As String
     Public num, VchType As Integer
+
+    Public Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        Dim sessId = TextBox1.Text
+        Dim Str1XML = File.ReadAllText(opsPath & sessId & "_xml1.txt")
+        Dim Str2XML = File.ReadAllText(opsPath & sessId & "_xml2.txt")
+        Dim StrXML = DataControl.generateXML(VchDate, Str1XML, Str2XML)
+        makeASale(9, StrXML)
+    End Sub
+
+    Public path = Constant.DATA_PATH & Constant.COMPANY_CODE & Constant.INVOICE_DIR
+    Public opsPath = Constant.DATA_PATH & Constant.COMPANY_CODE & Constant.OPS_DIR
 
 
 
@@ -26,6 +44,8 @@ Public Class Form3
             FI.OpenDB(Constant.PRG_PATH, Constant.DATA_PATH, Constant.COMPANY_CODE)
             Label1.Text = "Connected to Database as: " & FI.GetCurrentUserName & " | SuperUser: " & FI.IfSuperUser(FI.GetCurrentUserName) & Constant.COMPANY_CODE
         Catch
+            MsgBox(Constant.ERR_DBREAD)
+            Close()
         End Try
 
         Return FI
@@ -52,16 +72,34 @@ Public Class Form3
 
 
 
-    Private Sub Form3_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Public Sub Form3_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        'FILL WITH DEFAULT VALUES
+        ItemQty.Text = 9
+        ItemAliasText.Text = "000008"
+
+
         'CREATE INVOICE DIR AT START
-        Dim path = Constant.DATA_PATH & Constant.COMPANY_CODE & Constant.INVOICE_DIR
+
+
         Try
             If (Not System.IO.Directory.Exists(path)) Then
                 System.IO.Directory.CreateDirectory(path)
             End If
+            If (Not System.IO.Directory.Exists(opsPath)) Then
+                System.IO.Directory.CreateDirectory(opsPath)
+            End If
         Catch
             MsgBox(Constant.ERR_PDFDIR, Title:=Constant.ERR_PDFDIR)
         End Try
+
+
+
+        RichTextBox1.AppendText(sessId & Environment.NewLine)
+        File.Create(opsPath & "\" & sessId & ".txt").Close()
+
+
+
+
 
         'DebugApp("")
 
@@ -87,22 +125,72 @@ Public Class Form3
         Loop
 
     End Function
+
+
+    Public Function PrintDebugger(Recordset)
+        Dim i As Integer = 0
+        Do Until i = Recordset.Fields.Count
+            Try
+                RichTextBox1.AppendText(Recordset.Fields(i).Name & " ---> " & Recordset.Fields(i).Value & Environment.NewLine)
+            Catch
+                RichTextBox1.AppendText(Recordset.Fields(i).Name & " ---> " & Environment.NewLine)
+            End Try
+            i += 1
+        Loop
+    End Function
+
+
+
     Public Function GetCurrentStockOfItem(ItemAlias)
         FI = connectDB()
         'qrst1 = FI.GetRecordset(DataControl.storedQueries("StockStatusNew", ItemAlias))
-        qrst1 = FI.GetRecordsetFromCompanyDB(DataControl.storedQueries("StockStatus", ItemAlias))
+        qrst1 = FI.GetRecordset(DataControl.storedQueries("StockStatusNew", ItemAlias))
         If Constant.CURRENT_MODE = "DEV" Then
-            Console.WriteLine(qrst1)
-            'RichTextBox2.AppendText(DataControl.storedQueries("StockStatusNew", ItemAlias) & Environment.NewLine)
             Dim i As Integer = 0
+
+
+            Arr1(0, 0) = "Learning Visual Basic"
+            Arr1(0, 1) = "John Smith"
+            Arr1(1, 0) = "Visual Basic in 1 Week"
+            Arr1(1, 1) = "Bill White"
+            Arr1(2, 0) = "Everything about Visual Basic"
+            Arr1(2, 1) = "Mary Green"
+            Arr1(3, 0) = "Programming Made Easy"
+            Arr1(3, 1) = "Mark Wilson"
+            Arr1(4, 0) = "Visual Basic 101"
+            Arr1(4, 1) = "Alan Woods"
+            'Arr1(5, 0) = "Visual Basic 101"
+            'Arr1(5, 1) = "Visual Basic 101"
+            MsgBox(Arr1.Length)
+            For intCount1 = 0 To 4
+                For intCount2 = 0 To 1
+                    MessageBox.Show(Arr1(intCount1, intCount2))
+                Next intCount2
+            Next intCount1
+
+            MsgBox("Done")
+
             Do Until i = qrst1.Fields.Count
-                Try
-                    RichTextBox1.AppendText(qrst1.Fields(i).Name & " ---> " & qrst1.Fields(i).Value & Environment.NewLine)
-                Catch
-                    RichTextBox1.AppendText(qrst1.Fields(i).Name & " ---> " & Environment.NewLine)
-                End Try
-                i += 1
+                'arr(i, 0) = qrst1.Fields(i).Name
+                'arr(i, 1) = qrst1.Fields(i).Value
+
             Loop
+            'RichTextBox2.AppendText(DataControl.storedQueries("StockStatusNew", ItemAlias) & Environment.NewLine)
+
+            Try
+                Do Until i = qrst1.Fields.Count
+
+                    Try
+                        RichTextBox1.AppendText(qrst1.Fields(i).Name & " ---> " & qrst1.Fields(i).Value & Environment.NewLine)
+                    Catch
+                        RichTextBox1.AppendText(qrst1.Fields(i).Name & " ---> " & Environment.NewLine)
+                    End Try
+                    i += 1
+                Loop
+
+            Catch
+            End Try
+
 
         End If
 
@@ -149,24 +237,21 @@ Public Class Form3
 
         Dim STName As String = GetSTPTName(ItemAlias)
         Dim STPTName As String = ConvertSTPT(STName)
-
-
         Dim ItemName As String
         Dim Price As Double
-
 
         ItemName = qrst()!Name.Value
         Price = qrst()!D2.Value
 
-
         Dim ItemSrNo As Integer = 1
         'TO-DO Quantity 
-        Dim Qty As Integer = 24
+        Dim Qty = ItemQty.Text
         Dim Amt As Double = Qty * Price
         VchType = Constant.VCH_TYPE
         VchDate = Constant.FY_DATE
 
         If Constant.CURRENT_MODE = "DEBUG" Then
+            PrintDebugger(qrst)
             Try
                 RichTextBox2.AppendText("Current Stock:  " & CurrentStock & Environment.NewLine)
                 RichTextBox2.AppendText("Item/Product: " & qrst()!PrintName.Value & Environment.NewLine)
@@ -183,14 +268,10 @@ Public Class Form3
             End Try
         End If
 
-        XMLStr = DataControl.generateXML(VchDate, STPTName, ItemName, Qty, Price, Amt)
-        Try
-            makeASale(VchType, XMLStr)
-        Catch
-            MsgBox(Constant.ERR_SALE)
-        End Try
+        XMLStr = DataControl.XMLItemDetail(ItemName, Qty, Price, Amt, STPTName)
 
-        generatePDF(49)
+
+        'generatePDF(49)
 
     End Function
 
@@ -212,6 +293,18 @@ Public Class Form3
         End If
         Return STName
     End Function
+
+
+
+    Public Function grap()
+        Try
+            makeASale(VchType, XMLStr)
+        Catch
+            MsgBox(Constant.ERR_SALE)
+        End Try
+    End Function
+
+
     Public Function makeASale(VchType, XMLStr)
         FI = connectDB()
         Try
@@ -225,6 +318,7 @@ Public Class Form3
                 RichTextBox2.AppendText(ErrMsg & Environment.NewLine)
                 RichTextBox2.AppendText(XMLStr & Environment.NewLine)
             End If
+            Close()
         End Try
         Return False
 
