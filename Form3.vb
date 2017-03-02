@@ -1,6 +1,10 @@
 ﻿Imports System.Data.OleDb
 Imports System.IO
+Imports System.Net
 Imports System.Runtime.Serialization.Formatters.Binary
+Imports System.Runtime.Serialization
+Imports System.Web.Script.Serialization
+Imports System.Web.Services.WebService
 Public Class Form3
     Public FI, obj As Object
     Public rst, qrst, qrst1, qrst2, qrst3 As DAO.Recordset
@@ -22,7 +26,7 @@ Public Class Form3
     Public num, VchType As Integer
 
     Public Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        Dim sessId = TextBox1.Text
+
         Dim Str1XML = File.ReadAllText(opsPath & sessId & "_xml1.txt")
         Dim Str2XML = File.ReadAllText(opsPath & sessId & "_xml2.txt")
         Dim StrXML = DataControl.generateXML(VchDate, Str1XML, Str2XML)
@@ -65,14 +69,50 @@ Public Class Form3
     Private Sub Button8_Click(sender As Object, e As EventArgs) Handles serviceCall.Click
 
         Dim serviceCallTest As New testService.Testing_Service
-
+        Dim re = serviceCallTest.Say_Hello("Microsoft") ', 928, 764)
+        MsgBox(re)
         'GetDataFromBusy("GRS", "Select * from Tran1 where VchCode = " & val)
-        MsgBox(serviceCallTest.Say_Hello("oh bhai"))
+
     End Sub
 
 
+    Public Function SrvCall(url, method, params)
+        Dim srv As WebRequest = WebRequest.Create(url)
+        Dim resp As WebResponse = srv.GetResponse()
+        Dim jsonString As String
+        Using sreader As System.IO.StreamReader = New System.IO.StreamReader(resp.GetResponseStream())
+            jsonString = sreader.ReadToEnd()
+        End Using
+        Dim jsSerializer As System.Web.Script.Serialization.JavaScriptSerializer = New System.Web.Script.Serialization.JavaScriptSerializer()
+        Dim jsonData = jsSerializer.DeserializeObject(jsonString)
+        'jsonData = jsSerializer.Deserialize(Of T)(jsonString)
+        Using fui = System.IO.File.CreateText(opsPath & "fui_xml1.txt")
+            fui.WriteLine(jsonData)
+        End Using
+        Console.WriteLine(jsonData)
+
+
+        'srv.Method = "GET"
+        'srv.ContentType = "application/x-www-form-urlencoded"
+        'Dim postData As String = "test"
+        'Dim byteArray As Byte() = encoding.UTF8.GetBytes(postData)
+        'Dim dataStream As Stream = srv.GetRequestStream()
+        'resp = srv.GetResponse()
+
+        '        dataStream.Write(byteArray, 0, byteArray.Length)
+        '       dataStream.Close()
+
+        'MsgBox("Done")
+
+    End Function
+
 
     Public Sub Form3_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Dim url = "http://localhost/studio/retail/retailVI/try.php"
+        'SrvCall(url, "GET", "")
+
+
+
         'FILL WITH DEFAULT VALUES
         ItemQty.Text = 9
         ItemAliasText.Text = "000008"
@@ -96,11 +136,6 @@ Public Class Form3
 
         RichTextBox1.AppendText(sessId & Environment.NewLine)
         File.Create(opsPath & "\" & sessId & ".txt").Close()
-
-
-
-
-
         'DebugApp("")
 
     End Sub
@@ -143,6 +178,7 @@ Public Class Form3
 
     Public Function GetCurrentStockOfItem(ItemAlias)
         FI = connectDB()
+
         'qrst1 = FI.GetRecordset(DataControl.storedQueries("StockStatusNew", ItemAlias))
         qrst1 = FI.GetRecordset(DataControl.storedQueries("StockStatusNew", ItemAlias))
         If Constant.CURRENT_MODE = "DEV" Then
@@ -268,7 +304,8 @@ Public Class Form3
             End Try
         End If
 
-        XMLStr = DataControl.XMLItemDetail(ItemName, Qty, Price, Amt, STPTName)
+        XMLStr = DataControl.XMLItemDetail(ItemName, Qty, Price, Amt, STPTName, sessId)
+
 
 
         'generatePDF(49)
@@ -308,8 +345,24 @@ Public Class Form3
     Public Function makeASale(VchType, XMLStr)
         FI = connectDB()
         Try
+            Dim LastBillDetails As DAO.Recordset = FI.GetRecordset(DataControl.storedQueries("LastBill", ""))
+            Dim LastBillNo = LastBillDetails()!VchNo.Value
+            Dim LastBillBase = LastBillDetails()!VchAmtBaseCur.Value
+            Dim LastBillFinal = LastBillDetails()!VchSalePurcAmt.Value
+
+            RichTextBox2.AppendText("Last Bill No.: " & LastBillNo & Environment.NewLine)
             If FI.SaveVchFromXML(VchType, XMLStr, ErrMsg) Then
                 RichTextBox2.AppendText("Sale Successful" & Environment.NewLine)
+                RichTextBox2.AppendText("This Bill No.: " & LastBillNo()!VchNo.Value + 1 & Environment.NewLine)
+
+                Dim ValidateCurrBill = ValidateLastBillNo(LastBillNo, LastBillBase, LastBillFinal)
+
+                Dim CurrBillDetails As DAO.Recordset = FI.GetRecordset(DataControl.storedQueries("CurrBill", ""))
+                Dim CurrBillNo = CurrBillDetails()!VchNo.Value
+                Dim CurrBillBase = CurrBillDetails()!VchAmtBaseCur.Value
+                Dim CurrBillFinal = CurrBillDetails()!VchSalePurcAmt.Value
+
+                generatePDF(CurrBillNo()!VchNo.Value + 1)
                 Return True
             End If
         Catch
@@ -324,8 +377,23 @@ Public Class Form3
 
     End Function
 
+
+    Public Function ValidateLastBillNo(LastBillNo, LastBillBase, LastBillFinal)
+        Dim LastBillDetails1 As DAO.Recordset = FI.GetRecordset(DataControl.storedQueries("LastBill", ""))
+        Dim LastBillNo1 = LastBillDetails1()!VchNo.Value
+        Dim LastBillBase1 = LastBillDetails1()!VchAmtBaseCur.Value
+        Dim LastBillFinal1 = LastBillDetails1()!VchSalePurcAmt.Value
+
+        If LastBillNo = LastBillNo1 And LastBillBase = LastBillBase1 And LastBillFinal = LastBillFinal1 Then
+            Return True
+        Else
+            Return False
+        End If
+
+    End Function
     Public Function generatePDF(VchCode)
         FI = connectDB()
+
         If Constant.CURRENT_MODE = "DEBUG" Then
             MsgBox(VchCode)
         End If
@@ -333,7 +401,7 @@ Public Class Form3
         Dim InvoicePath = Constant.DATA_PATH & Constant.COMPANY_CODE & Constant.INVOICE_DIR & VchCode
 
         Try
-            pdfGen = FI.GeneratePDFForInvoice(VchCode, InvoicePath)
+            pdfGen = FI.GeneratePDFForInvoice(VchCode + 5, InvoicePath)
         Catch
             MsgBox(Constant.ERR_PDF)
         End Try

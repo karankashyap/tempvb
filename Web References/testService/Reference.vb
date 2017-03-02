@@ -73,14 +73,15 @@ Namespace testService
         
         '''<remarks/>
         Public Event Say_HelloCompleted As Say_HelloCompletedEventHandler
-        
+
         '''<remarks/>
-        <System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:Testing_Service#hello", RequestNamespace:="urn:Testing_Service", ResponseNamespace:="urn:Testing_Service")>  _
-        Public Function Say_Hello(ByVal name As String) As <System.Xml.Serialization.SoapElementAttribute("return")> String
-            Dim results() As Object = Me.Invoke("Say_Hello", New Object() {name})
-            Return CType(results(0),String)
+        <System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:Testing_Service#hello", RequestNamespace:="urn:Testing_Service", ResponseNamespace:="urn:Testing_Service")>
+        Public Function Say_Hello(ByVal itemName As String) As <System.Xml.Serialization.SoapElementAttribute("return")> String
+            ',  itemAlias As String, stock As Integer
+            Dim results() As Object = Me.Invoke("Say_Hello", New Object() {itemName})
+            Return CType(results(0), String)
         End Function
-        
+
         '''<remarks/>
         Public Overloads Sub Say_HelloAsync(ByVal name As String)
             Me.Say_HelloAsync(name, Nothing)

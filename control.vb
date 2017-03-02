@@ -47,6 +47,8 @@ Public Class DataControl
                         M1.Code=MS.MasterCode where MS.MasterCode=(Select CM8 From Master1 where 
                         MasterType=6 and 
                         Alias='" & ItemAlias & "')"
+        ElseIf qName = "LastBill" Then
+            RetQrr = "Select TOP 1 VchNo,VchAmtBaseCur,VchSalePurcAmt  from Tran1 ORDER BY VchCode DESC"
         ElseIf qName = "TestQrr" Then
             RetQrr = "Select * from Master1 where MasterType=2"
         End If
@@ -58,7 +60,7 @@ Public Class DataControl
     End Function
 
 
-    Public Function XMLItemDetail(ItemName, Qty, Price, Amt, STPTName)
+    Public Function XMLItemDetail(ItemName, Qty, Price, Amt, STPTName, sessId)
 
         XMLStr2 = XMLStr2 & "<STPTName>" & STPTName & "</STPTName><MasterName1>Cash</MasterName1>"
         XMLStr1 = XMLStr1 & "<ItemDetail><ItemName>" & ItemName & "</ItemName><Qty>" & Qty & "</Qty><Price>" & Price & "</Price><Amt>" & Amt & "</Amt></ItemDetail>"
