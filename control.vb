@@ -2,7 +2,7 @@
 Public Class DataControl
     Inherits Form3
 
-    Public Shared Function storedQueries(qName, ItemAlias)
+    Public Shared Function storedQueries(qName, ItemAlias, param3, param4, param5)
         Dim RetQrr As String
         If qName = "StockStatus" Then
             RetQrr = "SELECT M.Name AS Name,(Select Top 1 NameAlias from Help1 as H1 where 
@@ -31,15 +31,13 @@ Public Class DataControl
                         (select Sum(d3) from tran4 where tran4.mastercode1=  M.C And  tran4.mastercode2= M.Cm) AS AmtOpBal
                         FROM(Select A.Name as Name, A.Alias As Alias, A.PrintName As PrintName, A.code As C, A.ParentGrp As PG, A.I4 As I4,
                         A.D9 as D9, A.CM1 As U1, A.CM2 As U2, B.Name As Mc, B.Code As CM , A.D2  from Master1 As A, Master1 as B
-                        where A.Mastertype = 6 And B.Mastertype = 11 And 
+                        where A.Mastertype = 6 And B.Mastertype = 11 And And B.Code = " & param3 & "And 
                         A.Alias ='" & ItemAlias & "') AS M LEFT JOIN
                         (SELECT mastercode1, Mastercode2, sum(value1) As MTB, sum(value2) AS ATB From 
                         tran2  Where rectype = 2
                         And Date <=#" & Constant.CL_DATE & "# 
                         group by Mastercode1, Mastercode2) AS S1
                         On (S1.Mastercode1 = M.c) And (S1.Mastercode2 = M.CM)  ORDER BY M.Name"
-            'And Date = '" & Constant.FY_DATE & "' 
-
         ElseIf qName = "GetProductInfo" Then
             RetQrr = "Select M.Name,M.Alias,M.PrintName,M.Code,M.D2,M.D3,M.D4,M.D9,M.D10,M.D16,M.D17,A.Address1,A.Address2,A.Address3,A.Address4 from Master1 AS M, MasterAddressInfo AS A where M.MasterType=6 AND M.Alias='" & ItemAlias & "' AND A.MasterCode=M.Code"
         ElseIf qName = "STPTName" Then
@@ -48,15 +46,28 @@ Public Class DataControl
                         MasterType=6 and 
                         Alias='" & ItemAlias & "')"
         ElseIf qName = "LastBill" Then
-            RetQrr = "Select TOP 1 VchNo,VchAmtBaseCur,VchSalePurcAmt  from Tran1 ORDER BY VchCode DESC"
+            RetQrr = "Select TOP 1 VchNo,VchAmtBaseCur,VchSalePurcAmt  from Tran1 ORDER BY VchNo DESC"
+        ElseIf qName = "FindBill" Then
+            RetQrr = "Select * from Tran1 where VchNo = '" & ItemAlias & "'"
+        ElseIf qName = "MatCentre" Then
+            RetQrr = "Select distinct MasterCode2,(select Name from Master1 where Code=Tran2.MasterCode2) as MCName,
+                        (select ParentGrp from Master1 where Code=Tran2.MasterCode2) as PGCode,
+                        (select Name from Master1 where Code=(select ParentGrp from Master1 where Code=Tran2.MasterCode2))
+                        as PGName from Tran2 where rectype=2"
         ElseIf qName = "TestQrr" Then
             RetQrr = "Select * from Master1 where MasterType=2"
         End If
         If Constant.CURRENT_MODE = "DEV" Then
+
             MsgBox(RetQrr, Title:=qName)
         End If
         Return RetQrr
 
+    End Function
+
+
+    Public Function QueriesWithParams(param1, param2, param3, param4)
+        ' Return "Select * from Tran1 where VchNo = '" & ItemAlias & "'"
     End Function
 
 

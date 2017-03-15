@@ -83,6 +83,16 @@ Namespace My
                 Return CType(Me("WindowsApplication1_testService_Testing_Service"),String)
             End Get
         End Property
+        
+        <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.SpecialSettingAttribute(Global.System.Configuration.SpecialSetting.WebServiceUrl),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("http://localhost:29516/WebService2.asmx")>  _
+        Public ReadOnly Property WindowsApplication1_helloWorld_WebService1() As String
+            Get
+                Return CType(Me("WindowsApplication1_helloWorld_WebService1"),String)
+            End Get
+        End Property
     End Class
 End Namespace
 

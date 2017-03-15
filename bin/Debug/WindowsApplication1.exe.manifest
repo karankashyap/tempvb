@@ -42,24 +42,24 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="WindowsApplication1.exe" size="46080">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="WindowsApplication1.exe" size="51200">
       <assemblyIdentity name="WindowsApplication1" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>hh/g5PbNEZmXfyF1S8LaM0XPNIx4TMPFNIRugY1TrdU=</dsig:DigestValue>
+        <dsig:DigestValue>DAmKAQUDjQsnHlYJynJ29apVTEGyaSIAH2lKjiGHGjM=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
-  <file name="WindowsApplication1.exe.config" size="1560">
+  <file name="WindowsApplication1.exe.config" size="1750">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>+P11ZL69CL3ypV7Nm9ZxPwH/w1ksL30leE9RcgBaOOQ=</dsig:DigestValue>
+      <dsig:DigestValue>5NR50JdLIdvGmMAHQ324xt8aF33khIHSYHFLeToB3RE=</dsig:DigestValue>
     </hash>
   </file>
 </asmv1:assembly>

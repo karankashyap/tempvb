@@ -1,13 +1,16 @@
 ﻿Imports System.Data.OleDb
 Imports System.IO
 Imports System.Net
+Imports System.Web
 Imports System.Runtime.Serialization.Formatters.Binary
 Imports System.Runtime.Serialization
 Imports System.Web.Script.Serialization
+Imports System.Web.Services
+Imports System.Web.Services.Protocols
 Imports System.Web.Services.WebService
 Public Class Form3
     Public FI, obj As Object
-    Public rst, qrst, qrst1, qrst2, qrst3 As DAO.Recordset
+    Public rst, qrst, qrst1, qrst2, qrst3, qrst4 As DAO.Recordset
     Public coll As Collection
     Public bool As Boolean
     Public dbl, CurrentStock As Double
@@ -24,6 +27,7 @@ Public Class Form3
 
     Public Qry, str1, ErrMsg, XMLStr, XMLStr1, XMLStr2, VchSeries, VchDate, VchNo As String
     Public num, VchType As Integer
+
 
     Public Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
 
@@ -62,14 +66,17 @@ Public Class Form3
         If IsDBNull(ItemAliasText) Then
             ItemAlias = False
         End If
-        GetDataFromBusy("GRS", DataControl.storedQueries("GetProductInfo", ItemAlias), ItemAlias)
+        GetDataFromBusy("GRS", DataControl.storedQueries("GetProductInfo", ItemAlias, "", "", ""), ItemAlias)
     End Sub
 
 
     Private Sub Button8_Click(sender As Object, e As EventArgs) Handles serviceCall.Click
+        Dim helloWorldService As New helloWorld.WebService1
+        Dim val2 As String = "Microsoft"
+        Dim re = helloWorldService.HelloWorld(val2, "Another String with Spaces", 734)
 
-        Dim serviceCallTest As New testService.Testing_Service
-        Dim re = serviceCallTest.Say_Hello("Microsoft") ', 928, 764)
+        'Dim serviceCallTest As New testService.Testing_Service
+        'Dim re = serviceCallTest.Say_Hello("Microsoft") ', 928, 764)
         MsgBox(re)
         'GetDataFromBusy("GRS", "Select * from Tran1 where VchCode = " & val)
 
@@ -110,7 +117,7 @@ Public Class Form3
     Public Sub Form3_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim url = "http://localhost/studio/retail/retailVI/try.php"
         'SrvCall(url, "GET", "")
-
+        FI = connectDB()
 
 
         'FILL WITH DEFAULT VALUES
@@ -143,8 +150,8 @@ Public Class Form3
 
 
     Public Function DebugApp(Query)
-        FI = connectDB()
-        Query = DataControl.storedQueries("GetProductInfo", "000001")
+
+        Query = DataControl.storedQueries("FindBill", "112", "", "", "")
 
         qrst = FI.GetRecordset(Query)
 
@@ -175,44 +182,24 @@ Public Class Form3
     End Function
 
 
+    Public Function GetMaterialCentres(itemMatCenter)
+        If itemMatCenter Then
+            qrst4 = FI.GetRecordset(DataControl.storedQueries("MatCentre", itemMatCenter, "", "", ""))
+        Else
+            qrst4 = FI.GetRecordset(DataControl.storedQueries("MatCentre", "", "", "", ""))
+        End If
+
+    End Function
+
+
 
     Public Function GetCurrentStockOfItem(ItemAlias)
-        FI = connectDB()
+
 
         'qrst1 = FI.GetRecordset(DataControl.storedQueries("StockStatusNew", ItemAlias))
-        qrst1 = FI.GetRecordset(DataControl.storedQueries("StockStatusNew", ItemAlias))
-        If Constant.CURRENT_MODE = "DEV" Then
-            Dim i As Integer = 0
-
-
-            Arr1(0, 0) = "Learning Visual Basic"
-            Arr1(0, 1) = "John Smith"
-            Arr1(1, 0) = "Visual Basic in 1 Week"
-            Arr1(1, 1) = "Bill White"
-            Arr1(2, 0) = "Everything about Visual Basic"
-            Arr1(2, 1) = "Mary Green"
-            Arr1(3, 0) = "Programming Made Easy"
-            Arr1(3, 1) = "Mark Wilson"
-            Arr1(4, 0) = "Visual Basic 101"
-            Arr1(4, 1) = "Alan Woods"
-            'Arr1(5, 0) = "Visual Basic 101"
-            'Arr1(5, 1) = "Visual Basic 101"
-            MsgBox(Arr1.Length)
-            For intCount1 = 0 To 4
-                For intCount2 = 0 To 1
-                    MessageBox.Show(Arr1(intCount1, intCount2))
-                Next intCount2
-            Next intCount1
-
-            MsgBox("Done")
-
-            Do Until i = qrst1.Fields.Count
-                'arr(i, 0) = qrst1.Fields(i).Name
-                'arr(i, 1) = qrst1.Fields(i).Value
-
-            Loop
-            'RichTextBox2.AppendText(DataControl.storedQueries("StockStatusNew", ItemAlias) & Environment.NewLine)
-
+        qrst1 = FI.GetRecordset(DataControl.storedQueries("StockStatusNew", ItemAlias, "", "", ""))
+        If Constant.CURRENT_MODE = "DEBUG" Then
+            Dim i = 0
             Try
                 Do Until i = qrst1.Fields.Count
 
@@ -226,9 +213,8 @@ Public Class Form3
 
             Catch
             End Try
-
-
         End If
+
 
         Try
             If Not IsDBNull(qrst1()!MainOpBal.Value) And Not IsDBNull(qrst1()!MainTransBal.Value) Then
@@ -242,8 +228,8 @@ Public Class Form3
 
 
     Public Function GetSTPTName(ItemAlias)
-        FI = connectDB()
-        qrst2 = FI.GetRecordset(DataControl.storedQueries("STPTName", ItemAlias))
+
+        qrst2 = FI.GetRecordset(DataControl.storedQueries("STPTName", ItemAlias, "", "", ""))
         Try
             If Not IsDBNull(qrst2()!Name.Value) And Not IsDBNull(qrst2()!D1.Value) Then
                 Return qrst2()!D1.Value
@@ -256,14 +242,14 @@ Public Class Form3
 
     Public Function GetDataFromBusy(Method, Query, ItemAlias)
 
-        FI = connectDB()
+
         If Method = "GRS" Then
             qrst = FI.GetRecordset(Query)
         ElseIf Method = "GRSBUSYDB" Then
             MsgBox("Executing... ")
-            qrst = FI.GetRecordsetFromCompanyDB(DataControl.storedQueries("StockStatus", ItemAlias))
+            qrst = FI.GetRecordsetFromCompanyDB(DataControl.storedQueries("StockStatus", ItemAlias, "", "", ""))
         ElseIf Method = "ExecuteQuery" Then
-            qrst = FI.ExecuteQuery(DataControl.storedQueries("StockStatus", ItemAlias))
+            qrst = FI.ExecuteQuery(DataControl.storedQueries("StockStatus", ItemAlias, "", "", ""))
         Else
             RichTextBox1.AppendText("Query Method not defined" & Environment.NewLine)
             Return 0
@@ -343,9 +329,10 @@ Public Class Form3
 
 
     Public Function makeASale(VchType, XMLStr)
-        FI = connectDB()
+
         Try
-            Dim LastBillDetails As DAO.Recordset = FI.GetRecordset(DataControl.storedQueries("LastBill", ""))
+            Dim LastBillDetails As DAO.Recordset = FI.GetRecordset(DataControl.storedQueries("LastBill", "", "", "", ""))
+            'Add Quantity as well
             Dim LastBillNo = LastBillDetails()!VchNo.Value
             Dim LastBillBase = LastBillDetails()!VchAmtBaseCur.Value
             Dim LastBillFinal = LastBillDetails()!VchSalePurcAmt.Value
@@ -353,16 +340,23 @@ Public Class Form3
             RichTextBox2.AppendText("Last Bill No.: " & LastBillNo & Environment.NewLine)
             If FI.SaveVchFromXML(VchType, XMLStr, ErrMsg) Then
                 RichTextBox2.AppendText("Sale Successful" & Environment.NewLine)
-                RichTextBox2.AppendText("This Bill No.: " & LastBillNo()!VchNo.Value + 1 & Environment.NewLine)
+                RichTextBox2.AppendText("This Bill No.: " & LastBillNo + 1 & Environment.NewLine)
 
-                Dim ValidateCurrBill = ValidateLastBillNo(LastBillNo, LastBillBase, LastBillFinal)
+                Dim ValidateCurrBill = ValidateBillNo(LastBillNo, LastBillBase, LastBillFinal)
 
-                Dim CurrBillDetails As DAO.Recordset = FI.GetRecordset(DataControl.storedQueries("CurrBill", ""))
-                Dim CurrBillNo = CurrBillDetails()!VchNo.Value
-                Dim CurrBillBase = CurrBillDetails()!VchAmtBaseCur.Value
-                Dim CurrBillFinal = CurrBillDetails()!VchSalePurcAmt.Value
+                If (ValidateCurrBill = True) Then
+                    generatePDF(LastBillNo + 1)
+                Else
+                    Dim CurrBillDetails As DAO.Recordset = FI.GetRecordset(DataControl.storedQueries("LastBill", "", "", "", ""))
+                    Dim CurrBillNo = CurrBillDetails()!VchNo.Value
+                    Dim CurrBillBase = CurrBillDetails()!VchAmtBaseCur.Value
+                    Dim CurrBillFinal = CurrBillDetails()!VchSalePurcAmt.Value
+                    generatePDF(CurrBillNo + 1)
 
-                generatePDF(CurrBillNo()!VchNo.Value + 1)
+                End If
+
+
+
                 Return True
             End If
         Catch
@@ -378,13 +372,14 @@ Public Class Form3
     End Function
 
 
-    Public Function ValidateLastBillNo(LastBillNo, LastBillBase, LastBillFinal)
-        Dim LastBillDetails1 As DAO.Recordset = FI.GetRecordset(DataControl.storedQueries("LastBill", ""))
-        Dim LastBillNo1 = LastBillDetails1()!VchNo.Value
-        Dim LastBillBase1 = LastBillDetails1()!VchAmtBaseCur.Value
-        Dim LastBillFinal1 = LastBillDetails1()!VchSalePurcAmt.Value
+    Public Function ValidateBillNo(BillNo, BillBase, BillFinal)
+        Dim BillDetails1 As DAO.Recordset = FI.GetRecordset(DataControl.storedQueries("LastBill", "", "", "", ""))
+        Dim BillNo1 = BillDetails1()!VchNo.Value
+        Dim BillBase1 = BillDetails1()!VchAmtBaseCur.Value
+        Dim BillFinal1 = BillDetails1()!VchSalePurcAmt.Value
 
-        If LastBillNo = LastBillNo1 And LastBillBase = LastBillBase1 And LastBillFinal = LastBillFinal1 Then
+        If BillNo = BillNo1 - 1 Then
+            'And BillBase = BillBase1 And BillFinal = BillFinal1 Then
             Return True
         Else
             Return False
@@ -392,11 +387,6 @@ Public Class Form3
 
     End Function
     Public Function generatePDF(VchCode)
-        FI = connectDB()
-
-        If Constant.CURRENT_MODE = "DEBUG" Then
-            MsgBox(VchCode)
-        End If
         Dim pdfGen = False
         Dim InvoicePath = Constant.DATA_PATH & Constant.COMPANY_CODE & Constant.INVOICE_DIR & VchCode
 
@@ -407,6 +397,7 @@ Public Class Form3
         End Try
         Try
             System.Diagnostics.Process.Start(InvoicePath & ".pdf")
+            Dim Reddd = InvoicePath & ".pdf"
         Catch
             MsgBox(Constant.ERR_OPNPDF)
         End Try
@@ -414,6 +405,10 @@ Public Class Form3
         Return pdfGen
 
     End Function
+
+
+
+
 
 
 End Class
