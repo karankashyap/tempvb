@@ -53,26 +53,6 @@ Namespace My
                 Return defaultInstance
             End Get
         End Property
-        
-        <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.SpecialSettingAttribute(Global.System.Configuration.SpecialSetting.ConnectionString),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=|DataDirectory|\Database1.mdb")>  _
-        Public ReadOnly Property Database1ConnectionString() As String
-            Get
-                Return CType(Me("Database1ConnectionString"),String)
-            End Get
-        End Property
-        
-        <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.SpecialSettingAttribute(Global.System.Configuration.SpecialSetting.ConnectionString),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Work\Lab\temp\Database1.mdb")>  _
-        Public ReadOnly Property Database1ConnectionString1() As String
-            Get
-                Return CType(Me("Database1ConnectionString1"),String)
-            End Get
-        End Property
     End Class
 End Namespace
 
@@ -84,9 +64,9 @@ Namespace My
     Friend Module MySettingsProperty
         
         <Global.System.ComponentModel.Design.HelpKeywordAttribute("My.Settings")>  _
-        Friend ReadOnly Property Settings() As Global.WindowsApplication1.My.MySettings
+        Friend ReadOnly Property Settings() As Global.RetailVI.My.MySettings
             Get
-                Return Global.WindowsApplication1.My.MySettings.Default
+                Return Global.RetailVI.My.MySettings.Default
             End Get
         End Property
     End Module

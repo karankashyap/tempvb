@@ -82,19 +82,19 @@ Module HttpListener
 
 
                     If fn = "getMaterialCentres" Then
-                        responseString = Form3.GetMaterialCentres("")
+                        responseString = MainApp.GetMaterialCentres("")
                     ElseIf fn = "addToCart" Then
-                        responseString = Form3.AddItemToCart(ItemAlias, sessId, userId)
+                        responseString = MainApp.AddItemToCart(ItemAlias, sessId, userId)
                     ElseIf fn = "addQuantity" Then
-                        responseString = Form3.editItemQuantity(ItemAlias, "add", sessId)
+                        responseString = MainApp.editItemQuantity(ItemAlias, "add", sessId)
                     ElseIf fn = "removeQuantity" Then
-                        responseString = Form3.editItemQuantity(ItemAlias, "remove", sessId)
+                        responseString = MainApp.editItemQuantity(ItemAlias, "remove", sessId)
                     ElseIf fn = "checkout" Then
-                        responseString = Form3.Checkout(sessId, userId)
+                        responseString = MainApp.Checkout(sessId, userId)
                     ElseIf fn = "checkBilling" Then
-                        responseString = Form3.CheckBilling(sessId, userId)
+                        responseString = MainApp.CheckBilling(sessId, userId)
                     ElseIf fn = "deleteItem" Then
-                        responseString = Form3.DeleteItem(ItemAlias, sessId)
+                        responseString = MainApp.DeleteItem(ItemAlias, sessId)
                     Else
 
                         responseString = "NULL"

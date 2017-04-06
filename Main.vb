@@ -1,10 +1,9 @@
 ﻿Imports System.Data.OleDb
 Imports System.IO
 Imports System.Net
+Imports System.Windows.Forms
 
-
-Public Class Form3
-
+Public Class MainApp
     Public FI, obj As Object
     Public rst, qrst, qrst1, qrst2, qrst3, qrst4 As DAO.Recordset
     Public coll As Collection
@@ -21,13 +20,11 @@ Public Class Form3
     Public Arr1(25, 2) As String
     Public fs As FileStream
 
-
     Public Qry, str1, ErrMsg, XMLStr, XMLStr1, XMLStr2, VchSeries, VchDate, VchNo As String
     Public num, VchType, Qty As Integer
 
 
-
-    Public CurrentDir = "D:\Program Files (x86)\BusyWin\DATA\Comp0005"
+    Public CurrentDir = File.ReadAllText("C:\RetailVI_setVal.txt")
 
     Public PRG_PATH = File.ReadAllText(CurrentDir + "/settings/" & "program_path.txt")
     Public DATA_PATH = File.ReadAllText(CurrentDir + "/settings/" & "data_path.txt")
@@ -38,7 +35,7 @@ Public Class Form3
     Public path = DATA_PATH & COMPANY_CODE & Constant.INVOICE_DIR
     Public opsPath = DATA_PATH & COMPANY_CODE & Constant.OPS_DIR
 
-    Public Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+    Public Sub Button1_Click(sender As Object, e As EventArgs)
 
     End Sub
 
@@ -113,11 +110,6 @@ Public Class Form3
 
 
 
-    Private Sub Button7_Click(sender As Object, e As EventArgs) Handles executeQuery.Click
-        AddItemToCart("", sessIdFromVB, "7503818158")
-    End Sub
-
-
     Public Function AddItemToCart(ItemAlias, sessId, userId)
         Dim BillFile = opsPath & "\" & sessId & "_" & userId & "_bill.txt"
         If (System.IO.File.Exists(BillFile)) Then
@@ -141,22 +133,6 @@ Public Class Form3
 
     End Function
 
-    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
-        Dim newValue = ItemQty.Text
-
-        newValue = newValue + 1
-        ItemQty.Text = newValue
-        Dim ItemAlias = ItemAliasText.Text
-        SaveValue(ItemAlias, "q", newValue, sessIdFromVB)
-    End Sub
-
-    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
-        Dim newValue = ItemQty.Text
-        newValue = newValue - 1
-        ItemQty.Text = newValue
-        Dim ItemAlias = ItemAliasText.Text
-        SaveValue(ItemAlias, "q", newValue, sessIdFromVB)
-    End Sub
 
 
     Public Function editItemQuantity(ItemAlias, mode, sessId)
@@ -291,7 +267,7 @@ Public Class Form3
         ElseIf Method = "ExecuteQuery" Then
             qrst = FI.ExecuteQuery(DataControl.storedQueries("StockStatus", ItemAlias, "", "", ""))
         Else
-            RichTextBox1.AppendText("Query Method not defined" & Environment.NewLine)
+
             Return 0
         End If
 

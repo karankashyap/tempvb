@@ -1,6 +1,6 @@
 ﻿
 Public Class DataControl
-    Inherits Form3
+    Inherits MainApp
 
     Public Shared Function storedQueries(qName, ItemAlias, param3, param4, param5)
         Dim RetQrr As String = ""
