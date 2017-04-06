@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
-  <asmv1:assemblyIdentity name="WindowsApplication1.exe" version="1.0.0.1" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
+  <asmv1:assemblyIdentity name="WindowsApplication1.exe" version="1.17.6.3" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
   <application />
   <entryPoint>
     <assemblyIdentity name="WindowsApplication1" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
@@ -42,36 +42,54 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="WindowsApplication1.exe" size="46080">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="WindowsApplication1.exe" size="55808">
       <assemblyIdentity name="WindowsApplication1" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>jWcoKTmmwEjuGPA1wRNCzwwuSbbVfHb8BwOno2vgpkM=</dsig:DigestValue>
+        <dsig:DigestValue>S/dhV1H04U2mszwJw51wC4CmKmOkkK7nije+g3x0uS4=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="WindowsApplication1.XmlSerializers.dll" size="10240">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="WindowsApplication1.XmlSerializers.dll" size="13824">
       <assemblyIdentity name="WindowsApplication1.XmlSerializers" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>KEbqUWA3xO9vEyGC7pWWPLv9FvB0HbBXl3UGpVACS5U=</dsig:DigestValue>
+        <dsig:DigestValue>6JewN9ua8KZi8VIqaOgTmg65J9ob57umTNg/Fgkz11E=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
-  <file name="WindowsApplication1.exe.config" size="1560">
+  <file name="WebService1.asmx" size="749">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>+P11ZL69CL3ypV7Nm9ZxPwH/w1ksL30leE9RcgBaOOQ=</dsig:DigestValue>
+      <dsig:DigestValue>FLLujVyRo5AGlrCVRdUv3Tf4R9qVxVL4dKG3X/2+fH4=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="WebService2.asmx" size="956">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>+XAKatxCn7pFEkv68G/LgcHgl72Y8TG9AQmC2fbXXKo=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="WindowsApplication1.exe.config" size="1750">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>5NR50JdLIdvGmMAHQ324xt8aF33khIHSYHFLeToB3RE=</dsig:DigestValue>
     </hash>
   </file>
 </asmv1:assembly>

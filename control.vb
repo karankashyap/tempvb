@@ -31,13 +31,14 @@ Public Class DataControl
                         (select Sum(d3) from tran4 where tran4.mastercode1=  M.C And  tran4.mastercode2= M.Cm) AS AmtOpBal
                         FROM(Select A.Name as Name, A.Alias As Alias, A.PrintName As PrintName, A.code As C, A.ParentGrp As PG, A.I4 As I4,
                         A.D9 as D9, A.CM1 As U1, A.CM2 As U2, B.Name As Mc, B.Code As CM , A.D2  from Master1 As A, Master1 as B
-                        where A.Mastertype = 6 And B.Mastertype = 11 And And B.Code = " & param3 & "And 
+                        where A.Mastertype = 6 And B.Mastertype = 11 And B.Code = " & param3 & "And 
                         A.Alias ='" & ItemAlias & "') AS M LEFT JOIN
                         (SELECT mastercode1, Mastercode2, sum(value1) As MTB, sum(value2) AS ATB From 
                         tran2  Where rectype = 2
                         And Date <=#" & Constant.CL_DATE & "# 
                         group by Mastercode1, Mastercode2) AS S1
                         On (S1.Mastercode1 = M.c) And (S1.Mastercode2 = M.CM)  ORDER BY M.Name"
+
         ElseIf qName = "GetProductInfo" Then
             RetQrr = "Select M.Name,M.Alias,M.PrintName,M.Code,M.D2,M.D3,M.D4,M.D9,M.D10,M.D16,M.D17,A.Address1,A.Address2,A.Address3,A.Address4 from Master1 AS M, MasterAddressInfo AS A where M.MasterType=6 AND M.Alias='" & ItemAlias & "' AND A.MasterCode=M.Code"
         ElseIf qName = "STPTName" Then
@@ -58,7 +59,6 @@ Public Class DataControl
             RetQrr = "Select * from Master1 where MasterType=2"
         End If
         If Constant.CURRENT_MODE = "DEV" Then
-
             MsgBox(RetQrr, Title:=qName)
         End If
         Return RetQrr

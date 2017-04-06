@@ -3,14 +3,21 @@
 
 
     'CHANGE THE FOLLOWING VALUES
-    Public Const PRG_PATH As String = "D:\Program Files (x86)\BusyWin" ' Path to where BUSY is installed
-    Public Const DATA_PATH As String = "D:\Program Files (x86)\BusyWin\DATA\" ' 
-    Public Const COMPANY_CODE As String = "Comp0003" ' Primary Company Code as shown in BUSY
+
+
+    'Public Const PRG_PATH As String = "D:\Program Files (x86)\BusyWin" ' Path to where BUSY is installed
+    'Public Const DATA_PATH As String = "D:\Program Files (x86)\BusyWin\DATA\"
+    'Public Const WEB_SERVICE_PATH As String = "http://localhost/studio/retail/retailVI/" ' 
+    'Public Const COMPANY_CODE As String = "Comp0005" ' Primary Company Code as shown in BUSY
     Public Const FY_DATE As String = "01-04-2017" ' FY Date to be used in the app
     Public Const CL_DATE As String = "04-01-2017" ' FY Date to be used in the app
     Public Const CURRENT_MODE As String = "DEBUG" ' DEV / LIVE / DEBUG
     Public Const INVOICE_DIR As String = "\invoice_pdf\" ' Company Code as shown in BUSY, NOT USED
     Public Const OPS_DIR As String = "\ops\" ' Company Code as shown in BUSY, NOT USED
+    Public Const LOCALHOST As String = "localhost:"
+    Public Const PORT As String = "8080"
+    Public Const HTTPLISTENER As String = "/HttpListener/"
+
 
 
     'DO NOT CHANGE THE FOLLOWING VALUES

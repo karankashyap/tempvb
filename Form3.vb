@@ -1,45 +1,97 @@
 ﻿Imports System.Data.OleDb
 Imports System.IO
 Imports System.Net
-Imports System.Web
-Imports System.Runtime.Serialization.Formatters.Binary
-Imports System.Runtime.Serialization
-Imports System.Web.Script.Serialization
-Imports System.Web.Services
-Imports System.Web.Services.Protocols
-Imports System.Web.Services.WebService
+
+
 Public Class Form3
+
     Public FI, obj As Object
     Public rst, qrst, qrst1, qrst2, qrst3, qrst4 As DAO.Recordset
     Public coll As Collection
     Public bool As Boolean
     Public dbl, CurrentStock As Double
-    Public dt As New DataTable
+    Public dt, dk As New DataTable
+    Public ds As DataSet = New DataSet
     Public objDA As New OleDbDataAdapter()
     Public ado As ADODB.Recordset
     Public random As New Random()
     Public id = random.Next(100000, 9999999)
-    Public sessId = id
+    Public sessIdFromVB = id
 
     Public Arr1(25, 2) As String
     Public fs As FileStream
 
 
     Public Qry, str1, ErrMsg, XMLStr, XMLStr1, XMLStr2, VchSeries, VchDate, VchNo As String
-    Public num, VchType As Integer
+    Public num, VchType, Qty As Integer
 
+
+
+    Public CurrentDir = "D:\Program Files (x86)\BusyWin\DATA\Comp0005"
+
+    Public PRG_PATH = File.ReadAllText(CurrentDir + "/settings/" & "program_path.txt")
+    Public DATA_PATH = File.ReadAllText(CurrentDir + "/settings/" & "data_path.txt")
+    Public WEB_SERVICE_PATH = File.ReadAllText(CurrentDir + "/settings/" & "web_service_path.txt")
+    Public COMPANY_CODE = File.ReadAllText(CurrentDir + "/settings/" & "company_code.txt")
+
+
+    Public path = DATA_PATH & COMPANY_CODE & Constant.INVOICE_DIR
+    Public opsPath = DATA_PATH & COMPANY_CODE & Constant.OPS_DIR
 
     Public Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
 
-        Dim Str1XML = File.ReadAllText(opsPath & sessId & "_xml1.txt")
-        Dim Str2XML = File.ReadAllText(opsPath & sessId & "_xml2.txt")
-        Dim StrXML = DataControl.generateXML(VchDate, Str1XML, Str2XML)
-        makeASale(9, StrXML)
     End Sub
 
-    Public path = Constant.DATA_PATH & Constant.COMPANY_CODE & Constant.INVOICE_DIR
-    Public opsPath = Constant.DATA_PATH & Constant.COMPANY_CODE & Constant.OPS_DIR
 
+
+
+    Public Function Checkout(sessId, userId)
+        If System.IO.File.Exists(opsPath & sessId & "_" & userId & "_bill.txt") Then
+            Return File.ReadAllText(opsPath & sessId & "_" & userId & "_bill.txt")
+        End If
+
+        Dim sessFile = opsPath & "\" & sessId & ".txt"
+        Dim reader As System.IO.StreamReader =
+        System.IO.File.OpenText(sessFile)
+        Console.WriteLine(sessFile)
+        Console.WriteLine(reader)
+        Dim ItemAlias
+        Dim o = 0
+        Try
+            Do
+                ItemAlias = reader.ReadLine()
+                If ItemAlias Is Nothing Then
+                    Exit Do
+                End If
+                If ItemAlias = "xxxxxx" Then
+                    Continue Do
+                End If
+
+                Dim Price = File.ReadAllText(opsPath & sessId & "_" & ItemAlias & "p.txt")
+                Dim ItemName = File.ReadAllText(opsPath & sessId & "_" & ItemAlias & "n.txt")
+                Dim Qty = File.ReadAllText(opsPath & sessId & "_" & ItemAlias & "q.txt")
+                Dim ItemDesc = File.ReadAllText(opsPath & sessId & "_" & ItemAlias & "d.txt")
+                Convert.ToInt32(Qty)
+                If Qty <= 0 Then
+                    Continue Do
+                End If
+                Dim STPTName = File.ReadAllText(opsPath & sessId & "_" & ItemAlias & "s.txt")
+                Dim Amt = Price * Qty
+                XMLStr = DataControl.XMLItemDetail(ItemName, Qty, Price, Amt, STPTName, sessId)
+
+            Loop Until ItemAlias Is Nothing
+        Catch
+
+        End Try
+        Try
+            Dim Str1XML = File.ReadAllText(opsPath & sessId & "_xml1.txt")
+            Dim Str2XML = File.ReadAllText(opsPath & sessId & "_xml2.txt")
+            Dim StrXML = DataControl.generateXML(Constant.FY_DATE, Str1XML, Str2XML)
+            Return makeASale(9, StrXML, userId, sessId)
+        Catch
+            Return "success=false&sale=Error&msg=Error in billing. Sale did not proceed."
+        End Try
+    End Function
 
 
     Function connectDB()
@@ -49,8 +101,8 @@ Public Class Form3
             FI = CreateObject(Constant.DEFAULT_DLL & "." & Constant.DEFAULT_CLASS)
         End Try
         Try
-            FI.OpenDB(Constant.PRG_PATH, Constant.DATA_PATH, Constant.COMPANY_CODE)
-            Label1.Text = "Connected to Database as: " & FI.GetCurrentUserName & " | SuperUser: " & FI.IfSuperUser(FI.GetCurrentUserName) & Constant.COMPANY_CODE
+            FI.OpenDB(PRG_PATH, DATA_PATH, COMPANY_CODE)
+            '            Label1.Text = "Connected to Database as: " & FI.GetCurrentUserName & " | SuperUser: " & FI.IfSuperUser(FI.GetCurrentUserName) & Constant.COMPANY_CODE
         Catch
             MsgBox(Constant.ERR_DBREAD)
             Close()
@@ -62,72 +114,110 @@ Public Class Form3
 
 
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles executeQuery.Click
-        Dim ItemAlias As String = ItemAliasText.Text
-        If IsDBNull(ItemAliasText) Then
-            ItemAlias = False
-        End If
-        GetDataFromBusy("GRS", DataControl.storedQueries("GetProductInfo", ItemAlias, "", "", ""), ItemAlias)
+        AddItemToCart("", sessIdFromVB, "7503818158")
     End Sub
+
+
+    Public Function AddItemToCart(ItemAlias, sessId, userId)
+        Dim BillFile = opsPath & "\" & sessId & "_" & userId & "_bill.txt"
+        If (System.IO.File.Exists(BillFile)) Then
+            Dim Sale = File.ReadAllText(BillFile)
+            Return "success=false&msg=Bill Already Generated for this session id&" & Sale
+        End If
+        If (System.IO.File.Exists(opsPath & "\" & sessId & ".txt")) Then
+
+        Else
+            CreateNewSessionFile(sessId)
+        End If
+        Return GetDataFromBusy("GRS", DataControl.storedQueries("GetProductInfo", ItemAlias, "", "", ""), ItemAlias, sessId, userId)
+    End Function
+
+    Public Function CreateNewSessionFile(sessId)
+        File.Create(opsPath & "\" & sessId & ".txt").Close()
+    End Function
 
 
     Private Sub Button8_Click(sender As Object, e As EventArgs) Handles serviceCall.Click
         Dim helloWorldService As New helloWorld.WebService1
-        Dim val2 As String = "Microsoft"
-        Dim re = helloWorldService.HelloWorld(val2, "Another String with Spaces", 734)
+        Dim another As New testService.Testing_Service
+        Dim aisu = another.Say_Hello("OB")
+        'Dim val2 As String = "Microsoft"
+        'Dim re = helloWorldService.HelloWorld(val2, "Another String with Spaces", 734)
 
         'Dim serviceCallTest As New testService.Testing_Service
         'Dim re = serviceCallTest.Say_Hello("Microsoft") ', 928, 764)
-        MsgBox(re)
+        MsgBox(aisu)
         'GetDataFromBusy("GRS", "Select * from Tran1 where VchCode = " & val)
 
     End Sub
 
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        Dim newValue = ItemQty.Text
+
+        newValue = newValue + 1
+        ItemQty.Text = newValue
+        Dim ItemAlias = ItemAliasText.Text
+        SaveValue(ItemAlias, "q", newValue, sessIdFromVB)
+    End Sub
+
+    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
+        Dim newValue = ItemQty.Text
+        newValue = newValue - 1
+        ItemQty.Text = newValue
+        Dim ItemAlias = ItemAliasText.Text
+        SaveValue(ItemAlias, "q", newValue, sessIdFromVB)
+    End Sub
+
+
+    Public Function editItemQuantity(ItemAlias, mode, sessId)
+        Dim newValue
+        Try
+            newValue = File.ReadAllText(opsPath & sessId & "_" & ItemAlias & "q.txt")
+        Catch
+        End Try
+
+        If (mode = "add") Then
+            newValue = newValue + 1
+        Else
+            newValue = newValue - 1
+        End If
+
+        If (newValue = -1) Then
+            DeleteItem(ItemAlias, sessId)
+            Return "quantity=-1&product=removed"
+        ElseIf (newValue = 0) Then
+            DeleteItem(ItemAlias, sessId)
+            Return "quantity=-1&product=removed"
+        Else
+        End If
+
+        SaveValue(ItemAlias, "q", newValue, sessId)
+        Return "quantity=" & newValue
+    End Function
 
     Public Function SrvCall(url, method, params)
-        Dim srv As WebRequest = WebRequest.Create(url)
+        Dim srv As WebRequest = WebRequest.Create(WEB_SERVICE_PATH & url & ".php?" & params)
         Dim resp As WebResponse = srv.GetResponse()
-        Dim jsonString As String
-        Using sreader As System.IO.StreamReader = New System.IO.StreamReader(resp.GetResponseStream())
-            jsonString = sreader.ReadToEnd()
-        End Using
-        Dim jsSerializer As System.Web.Script.Serialization.JavaScriptSerializer = New System.Web.Script.Serialization.JavaScriptSerializer()
-        Dim jsonData = jsSerializer.DeserializeObject(jsonString)
-        'jsonData = jsSerializer.Deserialize(Of T)(jsonString)
-        Using fui = System.IO.File.CreateText(opsPath & "fui_xml1.txt")
-            fui.WriteLine(jsonData)
-        End Using
-        Console.WriteLine(jsonData)
+        Dim dataStream As Stream = resp.GetResponseStream()
+        Dim Reader As StreamReader = New StreamReader(dataStream)
+        Dim strData As String = Reader.ReadToEnd()
+
+        MsgBox(strData)
+
+        Return strData
 
 
-        'srv.Method = "GET"
-        'srv.ContentType = "application/x-www-form-urlencoded"
-        'Dim postData As String = "test"
-        'Dim byteArray As Byte() = encoding.UTF8.GetBytes(postData)
-        'Dim dataStream As Stream = srv.GetRequestStream()
-        'resp = srv.GetResponse()
-
-        '        dataStream.Write(byteArray, 0, byteArray.Length)
-        '       dataStream.Close()
-
-        'MsgBox("Done")
 
     End Function
 
 
     Public Sub Form3_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Dim url = "http://localhost/studio/retail/retailVI/try.php"
-        'SrvCall(url, "GET", "")
         FI = connectDB()
-
-
-        'FILL WITH DEFAULT VALUES
-        ItemQty.Text = 9
-        ItemAliasText.Text = "000008"
-
-
+        'Dim WEB_SERVICE_PATH = File.ReadAllText(opsPath & sessId & "_xml1.txt")
         'CREATE INVOICE DIR AT START
-
-
+        'MsgBox(CheckBilling(3453, 9877848932))
+        'SaveBillInfo(3456, 1156, 9877848932)
+        Console.WriteLine(PRG_PATH)
         Try
             If (Not System.IO.Directory.Exists(path)) Then
                 System.IO.Directory.CreateDirectory(path)
@@ -139,13 +229,21 @@ Public Class Form3
             MsgBox(Constant.ERR_PDFDIR, Title:=Constant.ERR_PDFDIR)
         End Try
 
+        Try
+            HttpListener.Main()
+        Catch
+            HttpListener.Main()
+        End Try
 
 
-        RichTextBox1.AppendText(sessId & Environment.NewLine)
-        File.Create(opsPath & "\" & sessId & ".txt").Close()
+
+        'RichTextBox1.AppendText(sessId & Environment.NewLine)
+        'File.Create(opsPath & "\" & sessId & ".txt").Close()
         'DebugApp("")
 
     End Sub
+
+
 
 
 
@@ -183,11 +281,26 @@ Public Class Form3
 
 
     Public Function GetMaterialCentres(itemMatCenter)
-        If itemMatCenter Then
-            qrst4 = FI.GetRecordset(DataControl.storedQueries("MatCentre", itemMatCenter, "", "", ""))
-        Else
-            qrst4 = FI.GetRecordset(DataControl.storedQueries("MatCentre", "", "", "", ""))
-        End If
+        'If itemMatCenter.Length > 1 Then
+        'qrst4 = FI.GetRecordset(DataControl.storedQueries("MatCentre", itemMatCenter, "", "", ""))
+        'Else
+        qrst4 = FI.GetRecordset(DataControl.storedQueries("MatCentre", "", "", "", ""))
+            Dim i As Integer = 0
+            Dim params
+        Do Until i = qrst4.Fields.Count
+            Try
+                params = qrst4()!MCName.Value & "=" & qrst4()!MasterCode2.Value & "&"
+                params = params & qrst4()!PGName.Value & "=" & qrst4()!PGCode.Value & "&"
+            Catch
+                params = "Main Store=201"
+            End Try
+            i += 1
+        Loop
+
+        Return params
+
+        'End If
+
 
     End Function
 
@@ -196,11 +309,12 @@ Public Class Form3
     Public Function GetCurrentStockOfItem(ItemAlias)
 
 
-        'qrst1 = FI.GetRecordset(DataControl.storedQueries("StockStatusNew", ItemAlias))
-        qrst1 = FI.GetRecordset(DataControl.storedQueries("StockStatusNew", ItemAlias, "", "", ""))
+        Dim CurrentStore = 201 'temp TO DO
+        qrst1 = FI.GetRecordset(DataControl.storedQueries("StockStatusNew", ItemAlias, CurrentStore, "", ""))
         If Constant.CURRENT_MODE = "DEBUG" Then
             Dim i = 0
             Try
+                RichTextBox1.AppendText(DataControl.storedQueries("StockStatusNew", ItemAlias, "", "", ""))
                 Do Until i = qrst1.Fields.Count
 
                     Try
@@ -240,8 +354,11 @@ Public Class Form3
 
     End Function
 
-    Public Function GetDataFromBusy(Method, Query, ItemAlias)
+    Public Function lol(msg)
+        Return msg
+    End Function
 
+    Public Function GetDataFromBusy(Method, Query, ItemAlias, sessId, userId)
 
         If Method = "GRS" Then
             qrst = FI.GetRecordset(Query)
@@ -264,10 +381,33 @@ Public Class Form3
 
         ItemName = qrst()!Name.Value
         Price = qrst()!D2.Value
-
+        Dim ItemDesc As String = ""
+        Try
+            ItemDesc = qrst()!Address1.Value & " "
+            ItemDesc = ItemDesc & qrst()!Address2.Value & " "
+            ItemDesc = ItemDesc & qrst()!Address3.Value & " "
+            ItemDesc = ItemDesc & qrst()!Address4.Value
+        Catch
+        End Try
         Dim ItemSrNo As Integer = 1
-        'TO-DO Quantity 
-        Dim Qty = ItemQty.Text
+        'TO-DO Quantity from Android
+
+        If Qty = 0 Then
+            Qty = 1
+        Else
+            Try
+                Qty = File.ReadAllText(opsPath & sessId & "_" & ItemAlias & "q.txt")
+            Catch
+                Qty = 1
+            End Try
+        End If
+        SaveValue(ItemAlias, "q", Qty, sessId)
+        SaveValue(ItemAlias, "p", Price, sessId)
+        SaveValue(ItemAlias, "n", ItemName, sessId)
+        SaveValue(ItemAlias, "s", STPTName, sessId)
+        SaveValue(ItemAlias, "d", ItemDesc, sessId)
+        SaveValue(ItemAlias, "u", userId, sessId)
+
         Dim Amt As Double = Qty * Price
         VchType = Constant.VCH_TYPE
         VchDate = Constant.FY_DATE
@@ -290,14 +430,65 @@ Public Class Form3
             End Try
         End If
 
-        XMLStr = DataControl.XMLItemDetail(ItemName, Qty, Price, Amt, STPTName, sessId)
+        Using addItemAlias = System.IO.File.AppendText(opsPath & "\" & sessId & ".txt")
+            addItemAlias.WriteLine(ItemAlias)
+        End Using
+
+        Dim param = "fn=addToCart&" & "alias=" & ItemAlias & "&ItemName=" & ItemName & "&quantity=" & Qty & "&Price=" & Price & "&Amt=" & Amt & "&CurrentStock=" & CurrentStock & "&STPTName=" & STPTName & "&sessId=" & sessId & "&desc=" & ItemDesc & "&userId=" & userId
+
+        Return param
 
 
 
-        'generatePDF(49)
+
 
     End Function
 
+
+
+    Public Function SaveValue(ItemAlias, what, howMuch, sessId)
+        Using ItemQty = System.IO.File.CreateText(opsPath & sessId & "_" & ItemAlias & what & ".txt")
+            ItemQty.WriteLine(howMuch)
+        End Using
+    End Function
+
+
+    Public Function DeleteItem(ItemAlias, sessId)
+        Dim pathDel = opsPath & sessId & "_" & ItemAlias
+        Try
+            File.Delete(pathDel & "d.txt")
+            File.Delete(pathDel & "n.txt")
+            File.Delete(pathDel & "p.txt")
+            File.Delete(pathDel & "q.txt")
+            File.Delete(pathDel & "s.txt")
+            RemoveLines(sessId, ItemAlias)
+            Return "success=true&msg=Item Removed"
+        Catch
+            Return "success=false&msg=Item could not be Removed."
+        End Try
+    End Function
+
+    Private Sub RemoveLines(sessId, ItemAlias)
+        Dim FilePath As String = opsPath & sessId & ".txt"
+        File.WriteAllText(FilePath, File.ReadAllText(FilePath).Replace(ItemAlias, "xxxxxx"))
+
+    End Sub
+
+    Public Function editQuantity(ItemAlias, action, Qty, sessId)
+        Dim QtyNew
+        If action = "add" Then
+            QtyNew = Qty + 1
+        Else
+            QtyNew = Qty - 1
+        End If
+        Dim fileReader As String = My.Computer.FileSystem.ReadAllText(opsPath & sessId & "_xml1.txt").Replace("<Qty>" & Qty & "</Qty>", "<Qty>" & QtyNew & "</Qty>")
+        My.Computer.FileSystem.WriteAllText(opsPath & sessId & "_xml1.txt", fileReader, False)
+    End Function
+
+
+    Public Function generateParams(paramString)
+
+    End Function
 
     Public Function ConvertSTPT(STPTName)
         Dim STName As String
@@ -319,55 +510,78 @@ Public Class Form3
 
 
 
-    Public Function grap()
+
+    Public Function makeASale(VchType, XMLStr, userId, sessId)
+        Dim ret As String
+        Dim LastBillNo, LastBillBase, LastBillFinal
         Try
-            makeASale(VchType, XMLStr)
+            Console.WriteLine("First Try")
+            Dim LastBillDetails As DAO.Recordset = FI.GetRecordset(DataControl.storedQueries("LastBill", "", "", "", ""))
+            LastBillNo = LastBillDetails()!VchNo.Value
+            LastBillBase = LastBillDetails()!VchAmtBaseCur.Value
+            LastBillFinal = LastBillDetails()!VchSalePurcAmt.Value
         Catch
-            MsgBox(Constant.ERR_SALE)
+            Console.WriteLine("First Catch")
         End Try
+
+        Try
+            Console.WriteLine("Secnond Try")
+            Dim CurrBillNo
+            If FI.SaveVchFromXML(VchType, XMLStr, ErrMsg) Then
+                Dim ValidateCurrBill = ValidateBillNo(LastBillNo, LastBillBase, LastBillFinal)
+                If (ValidateCurrBill = True) Then
+                    Dim pdf = False 'generatePDF(LastBillNo + 1)
+                    Console.WriteLine("Val1")
+                    ret = "success=true&sale=" & LastBillNo + 1 & "&pdf=" & pdf & "&userId=" & userId
+                    SaveBillInfo(sessId, LastBillNo, userId)
+                Else
+                    Dim CurrBillDetails As DAO.Recordset = FI.GetRecordset(DataControl.storedQueries("LastBill", "", "", "", ""))
+                    CurrBillNo = CurrBillDetails()!VchNo.Value
+                    Dim CurrBillBase = CurrBillDetails()!VchAmtBaseCur.Value
+                    Dim CurrBillFinal = CurrBillDetails()!VchSalePurcAmt.Value
+                    Dim pdf = False 'generatePDF(CurrBillNo + 1)
+                    Console.WriteLine("Val2")
+                    ret = "success=true&sale=" & CurrBillNo + 1 & "&pdf=" & pdf & "&userId=" & userId
+                    SaveBillInfo(sessId, LastBillNo, userId)
+                End If
+            Else
+                ret = "success=false&sale=Error&msg=" & ErrMsg
+            End If
+        Catch
+            ret = "success=false&sale=Error&msg=Error in Billing. Invalid Bill Number. Code: 2MAS"
+
+        End Try
+
+        Console.WriteLine("End of Try Blocks")
+        Return ret
+
     End Function
 
 
-    Public Function makeASale(VchType, XMLStr)
+    Public Function SaveBillInfo(sessId, BillNo, UserId)
+        BillNo = BillNo.Replace(" ", "")
+        BillNo = BillNo + 1
+        Using ItemQty = System.IO.File.CreateText(opsPath & sessId & "_" & UserId & "_bill.txt")
+            ItemQty.WriteLine("sessId=" & sessId & "&sale=" & BillNo & "&userId=" & UserId)
+        End Using
 
+        Using BILLS = System.IO.File.AppendText(opsPath & "\BILLS.txt")
+            BILLS.WriteLine(sessId & vbTab & BillNo & vbTab & UserId & vbTab & DateTime.Now.ToString() & vbNewLine)
+        End Using
+        'Dim XLA As Excel.Application = New Microsoft.Office.Interop.Excel.Application()
+        'Dim XLW As Excel.Workbook
+        'Dim XLS As Excel.Worksheet
+
+    End Function
+
+
+    Public Function CheckBilling(sessId, userId)
         Try
-            Dim LastBillDetails As DAO.Recordset = FI.GetRecordset(DataControl.storedQueries("LastBill", "", "", "", ""))
-            'Add Quantity as well
-            Dim LastBillNo = LastBillDetails()!VchNo.Value
-            Dim LastBillBase = LastBillDetails()!VchAmtBaseCur.Value
-            Dim LastBillFinal = LastBillDetails()!VchSalePurcAmt.Value
-
-            RichTextBox2.AppendText("Last Bill No.: " & LastBillNo & Environment.NewLine)
-            If FI.SaveVchFromXML(VchType, XMLStr, ErrMsg) Then
-                RichTextBox2.AppendText("Sale Successful" & Environment.NewLine)
-                RichTextBox2.AppendText("This Bill No.: " & LastBillNo + 1 & Environment.NewLine)
-
-                Dim ValidateCurrBill = ValidateBillNo(LastBillNo, LastBillBase, LastBillFinal)
-
-                If (ValidateCurrBill = True) Then
-                    generatePDF(LastBillNo + 1)
-                Else
-                    Dim CurrBillDetails As DAO.Recordset = FI.GetRecordset(DataControl.storedQueries("LastBill", "", "", "", ""))
-                    Dim CurrBillNo = CurrBillDetails()!VchNo.Value
-                    Dim CurrBillBase = CurrBillDetails()!VchAmtBaseCur.Value
-                    Dim CurrBillFinal = CurrBillDetails()!VchSalePurcAmt.Value
-                    generatePDF(CurrBillNo + 1)
-
-                End If
-
-
-
-                Return True
-            End If
+            Return File.ReadAllText(opsPath & sessId & "_" & userId & "_bill.txt")
         Catch
-            MsgBox(Constant.ERR_SALE)
-            If Constant.CURRENT_MODE = "DEBUG" Then
-                RichTextBox2.AppendText(ErrMsg & Environment.NewLine)
-                RichTextBox2.AppendText(XMLStr & Environment.NewLine)
-            End If
-            Close()
+            Return "sessId=" & sessId & "&sale=Error" & "&msg=Sale was not recorded. Checkout again."
         End Try
-        Return False
+
 
     End Function
 
@@ -388,7 +602,8 @@ Public Class Form3
     End Function
     Public Function generatePDF(VchCode)
         Dim pdfGen = False
-        Dim InvoicePath = Constant.DATA_PATH & Constant.COMPANY_CODE & Constant.INVOICE_DIR & VchCode
+
+        Dim InvoicePath = DATA_PATH & COMPANY_CODE & Constant.INVOICE_DIR & VchCode
 
         Try
             pdfGen = FI.GeneratePDFForInvoice(VchCode + 5, InvoicePath)
@@ -402,9 +617,22 @@ Public Class Form3
             MsgBox(Constant.ERR_OPNPDF)
         End Try
 
-        Return pdfGen
+
 
     End Function
+
+
+
+    Public Function FileCleanup(token)
+        Dim directory = opsPath
+        Dim oldDir = opsPath & "old\"
+        For Each filename As String In IO.Directory.GetFiles(directory, "**", IO.SearchOption.AllDirectories)
+            My.Computer.FileSystem.MoveFile(filename, oldDir & filename)
+        Next
+    End Function
+
+
+
 
 
 

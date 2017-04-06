@@ -22,6 +22,36 @@ WindowsApplication1
   resource lookups using this strongly typed resource class.
 </summary>
 </member>
+<member name="T:WindowsApplication1.helloWorld.WebService1">
+<remarks/>
+</member>
+<member name="M:WindowsApplication1.helloWorld.WebService1.#ctor">
+<remarks/>
+</member>
+<member name="E:WindowsApplication1.helloWorld.WebService1.HelloWorldCompleted">
+<remarks/>
+</member>
+<member name="M:WindowsApplication1.helloWorld.WebService1.HelloWorld(System.Object,System.Object,System.Object)">
+<remarks/>
+</member>
+<member name="M:WindowsApplication1.helloWorld.WebService1.HelloWorldAsync">
+<remarks/>
+</member>
+<member name="M:WindowsApplication1.helloWorld.WebService1.HelloWorldAsync(System.Object)">
+<remarks/>
+</member>
+<member name="M:WindowsApplication1.helloWorld.WebService1.CancelAsync(System.Object)">
+<remarks/>
+</member>
+<member name="T:WindowsApplication1.helloWorld.HelloWorldCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:WindowsApplication1.helloWorld.HelloWorldCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:WindowsApplication1.helloWorld.HelloWorldCompletedEventArgs.Result">
+<remarks/>
+</member>
 <member name="T:WindowsApplication1.testService.Testing_Service">
 <remarks/>
 </member>
