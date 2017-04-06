@@ -42,54 +42,24 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="WindowsApplication1.exe" size="57856">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="WindowsApplication1.exe" size="49152">
       <assemblyIdentity name="WindowsApplication1" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>1B2HtQyhtu8byQWSCzo5jr8ayNdxGz+lhSQ3N2dZxOk=</dsig:DigestValue>
+        <dsig:DigestValue>PvTgjx5MLv5wzYt5s38hjXNxqPbVyWORKAdiCsY0ASY=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
-  <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="WindowsApplication1.XmlSerializers.dll" size="13824">
-      <assemblyIdentity name="WindowsApplication1.XmlSerializers" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
-      <hash>
-        <dsig:Transforms>
-          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
-        </dsig:Transforms>
-        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>7kqknGrAgnmh6KIZ38TLoFFEPHaBFfi2WiLnuvqjeTk=</dsig:DigestValue>
-      </hash>
-    </dependentAssembly>
-  </dependency>
-  <file name="WebService1.asmx" size="749">
+  <file name="WindowsApplication1.exe.config" size="760">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>FLLujVyRo5AGlrCVRdUv3Tf4R9qVxVL4dKG3X/2+fH4=</dsig:DigestValue>
-    </hash>
-  </file>
-  <file name="WebService2.asmx" size="956">
-    <hash>
-      <dsig:Transforms>
-        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
-      </dsig:Transforms>
-      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>+XAKatxCn7pFEkv68G/LgcHgl72Y8TG9AQmC2fbXXKo=</dsig:DigestValue>
-    </hash>
-  </file>
-  <file name="WindowsApplication1.exe.config" size="1750">
-    <hash>
-      <dsig:Transforms>
-        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
-      </dsig:Transforms>
-      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>5NR50JdLIdvGmMAHQ324xt8aF33khIHSYHFLeToB3RE=</dsig:DigestValue>
+      <dsig:DigestValue>tZ3kjkLm+abWoi7bMPlnPprHpBXtNkgVhE6hedDHk9A=</dsig:DigestValue>
     </hash>
   </file>
 </asmv1:assembly>

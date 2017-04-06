@@ -3,7 +3,7 @@ Public Class DataControl
     Inherits Form3
 
     Public Shared Function storedQueries(qName, ItemAlias, param3, param4, param5)
-        Dim RetQrr As String
+        Dim RetQrr As String = ""
         If qName = "StockStatus" Then
             RetQrr = "SELECT M.Name AS Name,(Select Top 1 NameAlias from Help1 as H1 where 
                     H1.NameOrAlias = 1 and H1.Code = M.PG) AS ParentGrpName, M.Mc AS McName, 
@@ -63,11 +63,6 @@ Public Class DataControl
         End If
         Return RetQrr
 
-    End Function
-
-
-    Public Function QueriesWithParams(param1, param2, param3, param4)
-        ' Return "Select * from Tran1 where VchNo = '" & ItemAlias & "'"
     End Function
 
 

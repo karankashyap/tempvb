@@ -1,6 +1,5 @@
 ﻿Imports System.Net
 Imports System.IO
-Imports System.Globalization
 Imports System.Collections.Specialized
 Module HttpListener
     Public ReadOnly Property QueryString As NameValueCollection
@@ -81,7 +80,6 @@ Module HttpListener
                             End Try
                         Next
 
-                    Console.WriteLine(sessId + userId)
 
                     If fn = "getMaterialCentres" Then
                         responseString = Form3.GetMaterialCentres("")

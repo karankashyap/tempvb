@@ -133,23 +133,13 @@ Public Class Form3
     End Function
 
     Public Function CreateNewSessionFile(sessId)
-        File.Create(opsPath & "\" & sessId & ".txt").Close()
+        Try
+            File.Create(opsPath & "\" & sessId & ".txt").Close()
+        Catch
+        End Try
+        Return True
+
     End Function
-
-
-    Private Sub Button8_Click(sender As Object, e As EventArgs) Handles serviceCall.Click
-        Dim helloWorldService As New helloWorld.WebService1
-        Dim another As New testService.Testing_Service
-        Dim aisu = another.Say_Hello("OB")
-        'Dim val2 As String = "Microsoft"
-        'Dim re = helloWorldService.HelloWorld(val2, "Another String with Spaces", 734)
-
-        'Dim serviceCallTest As New testService.Testing_Service
-        'Dim re = serviceCallTest.Say_Hello("Microsoft") ', 928, 764)
-        MsgBox(aisu)
-        'GetDataFromBusy("GRS", "Select * from Tran1 where VchCode = " & val)
-
-    End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
         Dim newValue = ItemQty.Text
@@ -170,7 +160,7 @@ Public Class Form3
 
 
     Public Function editItemQuantity(ItemAlias, mode, sessId)
-        Dim newValue
+        Dim newValue = 0
         Try
             newValue = File.ReadAllText(opsPath & sessId & "_" & ItemAlias & "q.txt")
         Catch
@@ -213,11 +203,6 @@ Public Class Form3
 
     Public Sub Form3_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         FI = connectDB()
-        'Dim WEB_SERVICE_PATH = File.ReadAllText(opsPath & sessId & "_xml1.txt")
-        'CREATE INVOICE DIR AT START
-        'MsgBox(CheckBilling(3453, 9877848932))
-        'SaveBillInfo(3456, 1156, 9877848932)
-        Console.WriteLine(PRG_PATH)
         Try
             If (Not System.IO.Directory.Exists(path)) Then
                 System.IO.Directory.CreateDirectory(path)
@@ -236,57 +221,15 @@ Public Class Form3
         End Try
 
 
-
-        'RichTextBox1.AppendText(sessId & Environment.NewLine)
-        'File.Create(opsPath & "\" & sessId & ".txt").Close()
-        'DebugApp("")
-
     End Sub
 
 
 
 
-
-    Public Function DebugApp(Query)
-
-        Query = DataControl.storedQueries("FindBill", "112", "", "", "")
-
-        qrst = FI.GetRecordset(Query)
-
-        Dim i As Integer = 0
-        Do Until i = qrst.Fields.Count
-            Try
-                RichTextBox1.AppendText(qrst.Fields(i).Name & " ---> " & qrst.Fields(i).Value & Environment.NewLine)
-            Catch
-                RichTextBox1.AppendText(qrst.Fields(i).Name & " ---> " & Environment.NewLine)
-            End Try
-
-            i += 1
-        Loop
-
-    End Function
-
-
-    Public Function PrintDebugger(Recordset)
-        Dim i As Integer = 0
-        Do Until i = Recordset.Fields.Count
-            Try
-                RichTextBox1.AppendText(Recordset.Fields(i).Name & " ---> " & Recordset.Fields(i).Value & Environment.NewLine)
-            Catch
-                RichTextBox1.AppendText(Recordset.Fields(i).Name & " ---> " & Environment.NewLine)
-            End Try
-            i += 1
-        Loop
-    End Function
-
-
     Public Function GetMaterialCentres(itemMatCenter)
-        'If itemMatCenter.Length > 1 Then
-        'qrst4 = FI.GetRecordset(DataControl.storedQueries("MatCentre", itemMatCenter, "", "", ""))
-        'Else
         qrst4 = FI.GetRecordset(DataControl.storedQueries("MatCentre", "", "", "", ""))
-            Dim i As Integer = 0
-            Dim params
+        Dim i As Integer = 0
+        Dim params = ""
         Do Until i = qrst4.Fields.Count
             Try
                 params = qrst4()!MCName.Value & "=" & qrst4()!MasterCode2.Value & "&"
@@ -307,28 +250,8 @@ Public Class Form3
 
 
     Public Function GetCurrentStockOfItem(ItemAlias)
-
-
-        Dim CurrentStore = 201 'temp TO DO
+        Dim CurrentStore = 201 'temp TO DO TODO
         qrst1 = FI.GetRecordset(DataControl.storedQueries("StockStatusNew", ItemAlias, CurrentStore, "", ""))
-        If Constant.CURRENT_MODE = "DEBUG" Then
-            Dim i = 0
-            Try
-                RichTextBox1.AppendText(DataControl.storedQueries("StockStatusNew", ItemAlias, "", "", ""))
-                Do Until i = qrst1.Fields.Count
-
-                    Try
-                        RichTextBox1.AppendText(qrst1.Fields(i).Name & " ---> " & qrst1.Fields(i).Value & Environment.NewLine)
-                    Catch
-                        RichTextBox1.AppendText(qrst1.Fields(i).Name & " ---> " & Environment.NewLine)
-                    End Try
-                    i += 1
-                Loop
-
-            Catch
-            End Try
-        End If
-
 
         Try
             If Not IsDBNull(qrst1()!MainOpBal.Value) And Not IsDBNull(qrst1()!MainTransBal.Value) Then
@@ -337,7 +260,7 @@ Public Class Form3
         Catch
             Return False
         End Try
-
+        Return False
     End Function
 
 
@@ -351,7 +274,7 @@ Public Class Form3
         Catch
             Return 1
         End Try
-
+        Return 1
     End Function
 
     Public Function lol(msg)
@@ -412,24 +335,6 @@ Public Class Form3
         VchType = Constant.VCH_TYPE
         VchDate = Constant.FY_DATE
 
-        If Constant.CURRENT_MODE = "DEBUG" Then
-            PrintDebugger(qrst)
-            Try
-                RichTextBox2.AppendText("Current Stock:  " & CurrentStock & Environment.NewLine)
-                RichTextBox2.AppendText("Item/Product: " & qrst()!PrintName.Value & Environment.NewLine)
-                RichTextBox2.AppendText("MRP: " & qrst()!D2.Value & Environment.NewLine)
-                RichTextBox2.AppendText("Description: " & qrst()!Address1.Value & Environment.NewLine)
-                RichTextBox2.AppendText("           " & qrst()!Address2.Value & Environment.NewLine)
-                RichTextBox2.AppendText("           " & qrst()!Address3.Value & Environment.NewLine)
-                RichTextBox2.AppendText("           " & qrst()!Address4.Value & Environment.NewLine)
-                RichTextBox2.AppendText("Code:  " & qrst()!Code.Value & Environment.NewLine)
-                RichTextBox2.AppendText("Closing Stock:  " & CurrentStock & Environment.NewLine)
-                RichTextBox2.AppendText("Amount: " & Amt & Environment.NewLine)
-                RichTextBox2.AppendText("STPT: " & STPTName & Environment.NewLine)
-            Catch
-            End Try
-        End If
-
         Using addItemAlias = System.IO.File.AppendText(opsPath & "\" & sessId & ".txt")
             addItemAlias.WriteLine(ItemAlias)
         End Using
@@ -450,6 +355,7 @@ Public Class Form3
         Using ItemQty = System.IO.File.CreateText(opsPath & sessId & "_" & ItemAlias & what & ".txt")
             ItemQty.WriteLine(howMuch)
         End Using
+        Return True
     End Function
 
 
@@ -474,21 +380,6 @@ Public Class Form3
 
     End Sub
 
-    Public Function editQuantity(ItemAlias, action, Qty, sessId)
-        Dim QtyNew
-        If action = "add" Then
-            QtyNew = Qty + 1
-        Else
-            QtyNew = Qty - 1
-        End If
-        Dim fileReader As String = My.Computer.FileSystem.ReadAllText(opsPath & sessId & "_xml1.txt").Replace("<Qty>" & Qty & "</Qty>", "<Qty>" & QtyNew & "</Qty>")
-        My.Computer.FileSystem.WriteAllText(opsPath & sessId & "_xml1.txt", fileReader, False)
-    End Function
-
-
-    Public Function generateParams(paramString)
-
-    End Function
 
     Public Function ConvertSTPT(STPTName)
         Dim STName As String
@@ -571,7 +462,7 @@ Public Class Form3
         'Dim XLA As Excel.Application = New Microsoft.Office.Interop.Excel.Application()
         'Dim XLW As Excel.Workbook
         'Dim XLS As Excel.Worksheet
-
+        Return True
     End Function
 
 
@@ -617,7 +508,7 @@ Public Class Form3
             MsgBox(Constant.ERR_OPNPDF)
         End Try
 
-
+        Return pdfGen
 
     End Function
 
@@ -629,6 +520,7 @@ Public Class Form3
         For Each filename As String In IO.Directory.GetFiles(directory, "**", IO.SearchOption.AllDirectories)
             My.Computer.FileSystem.MoveFile(filename, oldDir & filename)
         Next
+        Return True
     End Function
 
 
